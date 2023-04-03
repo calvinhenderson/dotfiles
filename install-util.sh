@@ -40,7 +40,7 @@ if [ -z "$DOTFILES_ROOT" ]; then
   export DOTFILES_ROOT="$HOME"
 fi
 
-dirname=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+export DOTFILES_SRC=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 if [ "$DOTFILES_INSTALL" -eq 1 ]; then
   echo "installing to $DOTFILES_ROOT"
@@ -69,17 +69,17 @@ for config in $DOTFILES_INSTALL_DIRS; do
 
     if [ "$2" == "dir" ]; then
       if [ "$DOTFILES_INSTALL" -eq 1 ]; then
-        echo "ln -s $0 $DOTFILES_INSTALL_LOC"
-        ln -s "$0" "$DOTFILES_INSTALL_LOC"
+        echo "ln -s "$DOTFILES_SRC/$0" $DOTFILES_INSTALL_LOC"
+        ln -s "$DOTFILES_SRC/$0" "$DOTFILES_INSTALL_LOC"
       elif [ "$DOTFILES_UNINSTALL" -eq 1 ]; then
         echo "rm -r $DOTFILES_INSTALL_LOC"
         rm -r "$DOTFILES_INSTALL_LOC" 2>/dev/null
       fi
     else
-      for file in $(ls -1A "$0"); do
+      for file in $(ls -1A "$DOTFILES_SRC/$0"); do
         if [ "$DOTFILES_INSTALL" -eq 1 ]; then
-          echo "ln -s $0/$file $DOTFILES_INSTALL_LOC/$file"
-          ln -s "$0/$file" "$DOTFILES_INSTALL_LOC/$file"
+          echo "ln -s $DOTFILES_SRC/$0/$file $DOTFILES_INSTALL_LOC/$file"
+          ln -s "$DOTFILES_SRC/$0/$file" "$DOTFILES_INSTALL_LOC/$file"
         elif [ "$DOTFILES_UNINSTALL" -eq 1 ]; then
           echo "rm -r $DOTFILES_INSTALL_LOC/$file"
           rm -r "$DOTFILES_INSTALL_LOC/$file" 2>/dev/null
