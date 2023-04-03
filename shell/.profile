@@ -14,15 +14,26 @@ if [ "$(basename $SHELL)" = "zsh" ]; then
   plugins=(git brew macos dotenv docker npm zsh-autosuggestions)
 fi
 
+# `ls` aliases
 LS="/bin/ls"
-
-alias vi="nvim"
 alias ls="$LS -1F --color=auto"
 alias ll="ls -l"
 alias la="ls -hA"
 alias lla="ls -lhA"
 alias lr="ls -R"
 alias lt="du -sh * | sort -h" # Sort by file size
+
+# `cp` alternative
 alias cpv="rsync -ah --progress"
+
+# vim and tmux aliases
+alias vi="nvim"
+alias tnew="tmux new-session -s"
+alias tattach="tmux attach-session -t"
+alias tls="tmux list-sessions"
+
+# git aliases
+alias ga="git add"
+alias gc="git commit"
 
 # vim: ts=2 sw=2 expandtab
