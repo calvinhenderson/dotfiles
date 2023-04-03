@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+NAME="$(date +%%m%d-%H%M%S)-$@.pdf"
+man -w "$@" &>/dev/null && man -t "$@" | pstopdf -o /tmp/${NAME}
+if [ -f "/tmp/${NAME}" ]; then
+	cat /tmp/${NAME} | open -f -a Preview
+	rm /tmp/${NAME}
+else
+	man "$@"
+fi
