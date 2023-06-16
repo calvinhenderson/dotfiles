@@ -3,9 +3,12 @@
 # Configure the installation paths here
 # syntax: local_path:install_path:[dir|files]
 DOTFILES_INSTALL_DIRS=$(cat <<EOF
-nvim:.config/nvim:dir
+nvim/init.lua:.config/nvim:files
+nvim/lua:.config/nvim/lua:dir
 scripts:bin:files
 shell:.:files
+tmux:.config/tmux:files
+zsh:.config/zsh:files
 EOF
 )
 
@@ -49,8 +52,8 @@ elif [ "$DOTFILES_UNINSTALL" -eq 1 ]; then
 fi
 
 read -p "continue (y/N)? " choice
-case $choice in
-  "y"|"Y"|"yes"|"YES")
+case $(echo "$choice" | tr '[:upper:]' '[:lower:]') in
+  "y"|"yes")
     break;;
   *)
     exit 0;;
@@ -60,33 +63,38 @@ echo "$DOTFILES_ROOT" > ~/.dotfiles_root
 
 for config in $DOTFILES_INSTALL_DIRS; do
   if [ -z "$config" ]; then continue; fi
-  echo "$config" | tr ':' '\n' | xargs sh -c '
-    if [ "$1" = "." ]; then
-      export DOTFILES_INSTALL_LOC="$DOTFILES_ROOT"
-    else
-      export DOTFILES_INSTALL_LOC="$DOTFILES_ROOT/$1"
-    fi
+  echo "$config" | tr ':' '\n' | xargs sh -c \
+    'export DOTFILES_INSTALL_LOC="$DOTFILES_ROOT"
 
     if [ "$2" == "dir" ]; then
+
       if [ "$DOTFILES_INSTALL" -eq 1 ]; then
-        echo "ln -s "$DOTFILES_SRC/$0" $DOTFILES_INSTALL_LOC"
-        ln -s "$DOTFILES_SRC/$0" "$DOTFILES_INSTALL_LOC"
+        echo "ln -s $DOTFILES_SRC/$0 $DOTFILES_INSTALL_LOC/$1"
+        ln -s "$DOTFILES_SRC/$0" "$DOTFILES_INSTALL_LOC/$1"
       elif [ "$DOTFILES_UNINSTALL" -eq 1 ]; then
-        echo "rm -r $DOTFILES_INSTALL_LOC"
-        rm -r "$DOTFILES_INSTALL_LOC" 2>/dev/null
+        echo "rm -r $DOTFILES_INSTALL_LOC/$1"
+        rm -r "$DOTFILES_INSTALL_LOC/$1" 2>/dev/null
       fi
+
     else
+
+      if [ "$DOTFILES_INSTALL" -eq 1 ]; then
+        echo "mkdir -p $DOTFILES_INSTALL_LOC/$1"
+        mkdir -p "$DOTFILES_INSTALL_LOC/$1"
+      fi
+
       for file in $(ls -1A "$DOTFILES_SRC/$0"); do
+        file=$(basename $file)
         if [ "$DOTFILES_INSTALL" -eq 1 ]; then
-          echo "ln -s $DOTFILES_SRC/$0/$file $DOTFILES_INSTALL_LOC/$file"
-          ln -s "$DOTFILES_SRC/$0/$file" "$DOTFILES_INSTALL_LOC/$file"
+          echo "ln -s $DOTFILES_SRC/$0/$file $DOTFILES_INSTALL_LOC/$1/$file"
+          ln -s "$DOTFILES_SRC/$0/$file" "$DOTFILES_INSTALL_LOC/$1/$file"
         elif [ "$DOTFILES_UNINSTALL" -eq 1 ]; then
-          echo "rm -r $DOTFILES_INSTALL_LOC/$file"
-          rm -r "$DOTFILES_INSTALL_LOC/$file" 2>/dev/null
+          echo "rm -r $DOTFILES_INSTALL_LOC/$1/$file"
+          rm -r "$DOTFILES_INSTALL_LOC/$1/$file" 2>/dev/null
         fi
+
       done
-    fi
-  '
+    fi'
 done
 
 export DOTFILES_INSTALL=

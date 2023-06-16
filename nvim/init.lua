@@ -35,7 +35,6 @@ I hope you enjoy your Neovim journey,
 
 P.S. You can delete this when you're done too. It's your config now :)
 --]]
-
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
@@ -75,7 +74,8 @@ require('lazy').setup({
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
-  { -- LSP Configuration & Plugins
+  {
+    -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
@@ -91,14 +91,17 @@ require('lazy').setup({
     },
   },
 
-  { -- Autocompletion
+  {
+    -- Autocompletion
     'hrsh7th/nvim-cmp',
-    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'hrsh7th/cmp-nvim-lsp-signature-help', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
+    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'hrsh7th/cmp-nvim-lsp-signature-help', 'L3MON4D3/LuaSnip',
+      'saadparwaiz1/cmp_luasnip' },
   },
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
-  { -- Adds git releated signs to the gutter, as well as utilities for managing changes
+  {
+    -- Adds git releated signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
       -- See `:help gitsigns.txt`
@@ -112,12 +115,13 @@ require('lazy').setup({
     },
   },
 
-  { -- Theme inspired by Atom
+  {
+    -- Theme inspired by Atom
     'navarasu/onedark.nvim',
     priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
+    -- config = function()
+    --   vim.cmd.colorscheme 'onedark'
+    -- end,
     opts = {
       style = 'warmer',
       term_colors = true,
@@ -127,7 +131,10 @@ require('lazy').setup({
     },
   },
 
-  { -- Set lualine as statusline
+  { 'catppuccin/nvim',      as = 'catppuccin' },
+
+  {
+    -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
     opts = {
@@ -140,7 +147,8 @@ require('lazy').setup({
     },
   },
 
-  { -- Add indentation guides even on blank lines
+  {
+    -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help indent_blankline.txt`
@@ -151,7 +159,7 @@ require('lazy').setup({
   },
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim',         opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   { 'nvim-telescope/telescope.nvim', version = '*', dependencies = { 'nvim-lua/plenary.nvim' } },
@@ -169,7 +177,8 @@ require('lazy').setup({
     end,
   },
 
-  { -- Highlight, edit, and navigate code
+  {
+    -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
@@ -179,16 +188,17 @@ require('lazy').setup({
     end,
   },
 
-  { -- File Explorer
+  {
+    -- File Explorer
     'nvim-tree/nvim-tree.lua',
     dependencies = {
       -- REQUIRES PATCHED FONT
-      -- 'nvim-tree/nvim-web-devicons', -- optional, for file icons
+      'nvim-tree/nvim-web-devicons', -- optional, for file icons
     },
     -- branch = 'nightly'
   },
 
-  -- Floating terminal 
+  -- Floating terminal
   'numToStr/FTerm.nvim',
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
@@ -208,8 +218,10 @@ require('lazy').setup({
   -- { import = 'custom.plugins' },
 }, {})
 
--- [[ Setting options ]]
+-- [[ Settings ]]
 -- See `:help vim.o`
+
+vim.cmd.colorscheme 'catppuccin'
 
 -- Set highlight on search
 vim.o.hlsearch = false
@@ -224,6 +236,11 @@ vim.o.mouse = 'a'
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
 vim.o.clipboard = 'unnamedplus'
+
+-- Set default tab stop
+vim.o.shiftwidth = 2
+vim.o.expandtab = true
+vim.o.tabstop = 2
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -241,6 +258,9 @@ vim.o.smartcase = true
 -- Keep signcolumn on by default
 vim.wo.signcolumn = 'yes'
 
+-- Visual column indicator
+vim.o.colorcolumn = 80
+
 -- Decrease update time
 vim.o.updatetime = 250
 vim.o.timeout = true
@@ -256,6 +276,8 @@ vim.o.termguicolors = true
 
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
+vim.keymap.set('n', '<leader><leader>e', ':edit ~/.config/nvim/init.lua<CR>', { silent = true })
+
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Remap for dealing with word wrap
@@ -310,10 +332,11 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'help', 'vim' },
+  ensure_installed = { "html", "css", "javascript", "typescript", "elixir", "heex", "help", "c", "cpp", "lua",
+    "markdown" },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-  auto_install = false,
+  auto_install = true,
 
   highlight = { enable = true },
   indent = { enable = true, disable = { 'python' } },
@@ -380,7 +403,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagn
 
 -- LSP settings.
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
   -- NOTE: Remember that lua is a real programming language, and as such it is possible
   -- to define small helper and utility functions so you don't have to repeat yourself
   -- many times.
@@ -421,8 +444,17 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
+
+  -- Format on save, if LSP formatting is available
+  if client.server_capabilities.documentFormattingProvider then
+    vim.cmd [[augroup Format]]
+    vim.cmd [[autocmd! * <buffer>]]
+    vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.format()]]
+    vim.cmd [[augroup END]]
+  end
 end
 
+-- [[ Language Servers ]]
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
 --
@@ -436,29 +468,49 @@ local servers = {
   clangd = {},
   jsonls = {},
   remark_ls = {},
-
   -- elixir
-  elixirls = {},
-  -- erlangls = {},
-
+  elixirls = {
+    cmd = { vim.fn.expand(require 'init.elixirls'.install() .. "/language_server.sh") },
+    elixirLS = {
+      dialyzerEnabled = true,
+      suggestSpecs = true,
+      signatureAfterComplete = true
+    }
+  },
   -- web
   html = {},
   eslint = {},
   cssls = {},
   svelte = {},
-  tailwindcss = {},
   tsserver = {},
-
+  tailwindcss = {
+    filetypes = { "html", "elixir", "eelixir", "heex" },
+    init_options = {
+      userLanguages = {
+        elixir = "html-eex",
+        eelixir = "html-eex",
+        heex = "html-eex"
+      },
+    },
+    settings = {
+      tailwindCSS = {
+        experimental = {
+          classRegex = { 'class[:]\\s*"([^"]*)"' },
+        },
+      },
+    },
+  },
   -- docker
   dockerls = {},
   docker_compose_language_service = {},
   yamlls = {},
-
   lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
+    settings = {
+      Lua = {
+        workspace = { checkThirdParty = false },
+        telemetry = { enable = false },
+      },
+    }
   },
 }
 
@@ -481,11 +533,13 @@ mason_lspconfig.setup {
 
 mason_lspconfig.setup_handlers {
   function(server_name)
-    require('lspconfig')[server_name].setup {
+    local lsp_options = {
       capabilities = capabilities,
       on_attach = on_attach,
-      settings = servers[server_name],
+      single_file_support = true,
     }
+
+    require('lspconfig')[server_name].setup(vim.tbl_extend("force", lsp_options, servers[server_name]))
   end,
 }
 
@@ -512,8 +566,9 @@ cmp.setup {
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
-      elseif luasnip.expand_or_jumpable() then
-        luasnip.expand_or_jump()
+        -- I think this is causing the cursor to jump around randomly
+        -- elseif luasnip.expand_or_jumpable() then
+        --   luasnip.expand_or_jump()
       else
         fallback()
       end
@@ -521,8 +576,9 @@ cmp.setup {
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
-        luasnip.jump(-1)
+        -- I think this is causing the cursor to jump around randomly
+        -- elseif luasnip.jumpable(-1) then
+        --   luasnip.jump(-1)
       else
         fallback()
       end
@@ -543,35 +599,37 @@ require 'nvim-tree'.setup {
       show = {
         file = true,
         folder = true,
-        folder_arrow = false,
+        -- Set to false when using custom icons to prevent a duplicate arrow
+        folder_arrow = true,
         git = true,
         modified = true,
       },
-      glyphs = {
-        default = "",
-        modified = "•",
-        symlink = " ",
-        bookmark = "›",
-        folder = {
-          arrow_closed = "▶︎",
-          arrow_open = "▼",
-          default = "▶︎",
-          open = "▼",
-          empty = "▷",
-          empty_open = "▽",
-          symlink = "↦",
-          symlink_open = "↧",
-        },
-        git = {
-          unstaged = "●",
-          staged = "✓",
-          unmerged = " ",
-          renamed = "✎",
-          untracked = "○",
-          deleted = "⊗",
-          ignored = "⊖",
-        },
-      }
+      -- Uncomment for better icons with an unpatched font
+      -- glyphs = {
+      --   default = "",
+      --   modified = "•",
+      --   symlink = " ",
+      --   bookmark = "›",
+      --   folder = {
+      --     arrow_closed = "▶︎",
+      --     arrow_open = "▼",
+      --     default = "▶︎",
+      --     open = "▼",
+      --     empty = "▷",
+      --     empty_open = "▽",
+      --     symlink = "↦",
+      --     symlink_open = "↧",
+      --   },
+      --   git = {
+      --     unstaged = "●",
+      --     staged = "✓",
+      --     unmerged = " ",
+      --     renamed = "✎",
+      --     untracked = "○",
+      --     deleted = "⊗",
+      --     ignored = "⊖",
+      --   },
+      -- }
     },
     group_empty = true,
   },
@@ -597,44 +655,6 @@ end
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 vim.keymap.set('n', '<leader>tt', require('nvim-tree.api').tree.toggle, { desc = '[T]ree [T]oggle' })
 
--- elixirls setup
-local elixirls_path = vim.fn.stdpath 'data' .. '/elixir-ls'
-if not vim.loop.fs_stat(elixirls_path .. '/language_server.sh') then
-  print('[elixir-ls] downloading...')
-  --
-  -- download the language server
-  vim.fn.system {
-    'curl', '-o', '/tmp/elixir-ls.zip',
-    '-sfL', 'https://github.com/elixir-lsp/elixir-ls/releases/latest/download/elixir-ls.zip',
-  }
-
-  print('[elixir-ls] installing..')
-
-  -- extract
-  vim.fn.system {
-    'unzip', '/tmp/elixir-ls.zip',
-    '-d', elixirls_path,
-  }
-
-  -- update permissions
-  vim.fn.system {
-    'chmod', '+x', elixirls_path .. '/language_server.sh',
-  }
-
-  if vim.loop.fs_stat(elixirls_path .. '/language_server.sh') then
-    print('[elixir-ls] installed')
-  else
-    print('[elixir-ls] installation failed.')
-  end
-end
-
-local lspconfig = require 'lspconfig'
-lspconfig.elixirls.setup {
-  cmd = { vim.fn.expand(elixirls_path .. "/language_server.sh") },
-  on_attach = on_attach,
-  capabilities = capabilities
-}
-
 -- FTerm setup
 local fterm = require 'FTerm'
 fterm.setup {
@@ -652,15 +672,15 @@ fterm.setup {
 
 vim.keymap.set('n', '<leader>`', require 'FTerm'.toggle, { desc = 'Toggle floating terminal' })
 
-vim.api.nvim_create_autocmd({"BufRead","BufNewFile"}, {
-  pattern = {"*.plist"},
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = { "*.plist" },
   command = "set ft=xml"
 })
 
 -- Theme toggle
 local timer = vim.loop.new_timer()
 if timer ~= nil then
-  timer:start(0, 1500, vim.schedule_wrap(function()
+  timer:start(0, 2000, vim.schedule_wrap(function()
     local dark_mode = true
     if vim.fn.has('macunix') then
       local system_theme = vim.fn.system { 'defaults', 'read', '-g', 'AppleInterfaceStyle' }
@@ -672,30 +692,27 @@ if timer ~= nil then
   end))
 end
 
---[[
-=====================================================================
-======================== KEY BINDINGS ===============================
-=====================================================================
-]]
+-- [[ Auto Commands ]]
 
+-- [[ Key Bindings ]]
 -- Buffers
-vim.keymap.set('n', '<leader>q', ':bp|bd #<CR>',  { desc = '[Q]uit buffer, keep pane' })
-vim.keymap.set('n', '<leader>Q', ':qa<CR>',       { desc = '[Q]uit all open buffers' })
-vim.keymap.set('n', '<leader>w', ':w<CR>',        { desc = '[W]rite buffer to disk' })
-vim.keymap.set('n', '<C-h>',     ':bp<CR>',       { desc = 'Switch to previous buffer' })
-vim.keymap.set('n', '<C-l>',     ':bn<CR>',       { desc = 'Switch to next buffer' })
+vim.keymap.set('n', '<leader>q', ':bp|bd #<CR>', { desc = '[Q]uit buffer, keep pane' })
+vim.keymap.set('n', '<leader>Q', ':qa<CR>', { desc = '[Q]uit all open buffers' })
+vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = '[W]rite buffer to disk' })
+vim.keymap.set('n', '<C-h>', ':bp<CR>', { desc = 'Switch to previous buffer' })
+vim.keymap.set('n', '<C-l>', ':bn<CR>', { desc = 'Switch to next buffer' })
 
 -- Splits
 vim.keymap.set('n', '<leader>H', ':vert resize -2<CR>', { desc = 'Shrink pane width' })
-vim.keymap.set('n', '<leader>L', ':vert resize +2<CR>',  { desc = 'Grow pane width' })
+vim.keymap.set('n', '<leader>L', ':vert resize +2<CR>', { desc = 'Grow pane width' })
 vim.keymap.set('n', '<leader>J', ':vert resize -2<CR>', { desc = 'Shrink pane height' })
-vim.keymap.set('n', '<leader>K', ':vert resize +2<CR>',  { desc = 'Grow pane height' })
+vim.keymap.set('n', '<leader>K', ':vert resize +2<CR>', { desc = 'Grow pane height' })
 
 -- Tabs
-vim.keymap.set('n', '<leader>tn', ':tabnew<CR>',   { desc = '[T]ab [N]ew' })
+vim.keymap.set('n', '<leader>tn', ':tabnew<CR>', { desc = '[T]ab [N]ew' })
 vim.keymap.set('n', '<leader>tq', ':tabclose<CR>', { desc = '[T]ab [C]lose' })
--- vim.keymap.set('n', '<C-j>',      ':tabp<CR>',     { desc = '[T]ab [J]Previous' })
--- vim.keymap.set('n', '<C-k>',      ':tabn<CR>',     { desc = '[T]ab [K]Next' })
+vim.keymap.set('n', '<M-h>', ':tabp<CR>', { desc = '[T]ab [J]Previous' })
+vim.keymap.set('n', '<M-l>', ':tabn<CR>', { desc = '[T]ab [K]Next' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
