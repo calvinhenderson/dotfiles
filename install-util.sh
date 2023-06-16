@@ -86,8 +86,8 @@ for config in $DOTFILES_INSTALL_DIRS; do
       for file in $(ls -1A "$DOTFILES_SRC/$0"); do
         file=$(basename $file)
         if [ "$DOTFILES_INSTALL" -eq 1 ]; then
-          echo "ln -s $DOTFILES_SRC/$0/$file $DOTFILES_INSTALL_LOC/$1/$file"
-          ln -s "$DOTFILES_SRC/$0/$file" "$DOTFILES_INSTALL_LOC/$1/$file"
+          echo "ln -s $DOTFILES_SRC/$0 $DOTFILES_INSTALL_LOC/$1/$file"
+          ln -s "$DOTFILES_SRC/$0" "$DOTFILES_INSTALL_LOC/$1/$file"
         elif [ "$DOTFILES_UNINSTALL" -eq 1 ]; then
           echo "rm -r $DOTFILES_INSTALL_LOC/$1/$file"
           rm -r "$DOTFILES_INSTALL_LOC/$1/$file" 2>/dev/null
