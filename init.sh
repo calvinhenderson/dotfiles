@@ -118,7 +118,7 @@ for config in $INSTALL_LOCATIONS; do
   DST=`echo "$config" | tr ':' '\n' | tail -n 1`
 
   for file in `list_files "$SRC"`; do
-    [ -n "$(echo basename -- "$file" | grep -oE '['$IGNORE_FILES']+$')" ] && continue
+    [ -n "$(echo basename -- "$file" | grep -oE \"[$IGNORE_FILES]+$\")" ] && continue
     [ `basename -- "$file"` = ".gitignore" ] && continue
     if [ $UNINSTALL -eq 1 ]; then
       uninstall_file "$file" "$DST"
