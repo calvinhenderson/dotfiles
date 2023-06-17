@@ -1,5 +1,7 @@
 # dotfiles
 
+![screenshot](assets/screenshot.png)
+
 ### Usage
 
 ```sh

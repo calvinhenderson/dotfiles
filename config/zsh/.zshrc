@@ -2,7 +2,7 @@
 source "$HOME/.env.sh"
 
 # [[ Install oh-my-zsh ]]
-if [ ! -d "$ZDOTDIR/ohmyzsh" ] && [ ! -f "$DOTFILES_INSTALL_DIR/.install_oh_my_zsh" ]; then
+if [ ! -d "$ZDOTDIR/ohmyzsh" ] && [ ! -f "$ZDOTDIR/.skip_oh_my_zsh_install" ]; then
   echo "oh-my-zsh is not installed."
 
   printf "Install oh-my-zsh? (y/N): "  >&2
@@ -15,7 +15,7 @@ if [ ! -d "$ZDOTDIR/ohmyzsh" ] && [ ! -f "$DOTFILES_INSTALL_DIR/.install_oh_my_z
       ;;
     *)
       # Don't prompt again
-      touch "$DOTFILES_INSTALL_DIR/.skip_oh_my_zsh_install"
+      touch "$ZDOTDIR/.skip_oh_my_zsh_install"
       ;;
   esac
 fi
@@ -40,13 +40,16 @@ else
   prompt walters
 fi
 
+# Force emacs bindings for CLI regardless of $EDITOR
+bindkey -e
+
 # [[ macOS Configuration ]]
 if echo "$OSTYPE" | grep -e '^.*darwin.*$' > /dev/null; then
   if [ -n $OHMYZSH_DIR ]; then
     plugins+=(brew macos) # Only install macOS-sepcific plugins here.
   fi
 
-  eval "$(/opt/homebrew/bin/brew shellenv)"
+  eval "$(brew shellenv)"
 fi
 
 # [[ Init oh-my-zsh ]]

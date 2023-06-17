@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 
-# Log a message and maybe quit on error
 log() {
   # Only use colors when running an interactive shell
   RED=""; YELLOW=""; GREEN=""; RESET="";
@@ -11,10 +10,9 @@ log() {
     RESET="\033[0m"
   fi
 
-  LEVEL="$1"; shift;
-
+  LOG_LEVEL="$1"; shift
   # 0: INFO, 1: WARN, 2: ERROR
-  case "$LEVEL" in
+  case "$LOG_LEVEL" in
     0) echo "$@" ;;
     1) echo "$GREEN$@$RESET" ;;
     2) echo "$YELLOW$@$RESET" ;;
@@ -26,7 +24,18 @@ log_success() { log 1 $@; }
 log_warn() { log 2 $@; }
 log_error() { log 3 $@; }
 
-usage() { echo "usage: $0 [-u|--uninstall][--dry-run]"; exit 1; }
+usage() {
+  cat <<EOF | sed -E 's/^[ ]{4}//'
+    usage: $0 [options]
+
+    options:
+      -h,--help         Show this message and exit.
+      -u,--uninstall    Uninstall existing files. No install is performed.
+      --dry-run         Performs a dry-run. No changes will be made.
+      --no-interaction  All user prompting is skipped. Use at your own risk.
+EOF
+  exit 0
+}
 
 # Convert input string to all lowercase
 to_lower() { echo "$1" | tr '[:upper:]' '[:lower:]'; }
@@ -34,12 +43,14 @@ to_lower() { echo "$1" | tr '[:upper:]' '[:lower:]'; }
 # Executes the command when not a dry-run
 maybe_exec() {
   log_info "$@"
-  [ ! $DRY_RUN ] && eval -- "$@"
+  [ $DRY_RUN -eq 0 ] && eval -- "$@"
 }
 
 # Prompts the user to continue.
 # Returns yes: 0, otherwise: 1
 maybe_continue() {
+  [ $NO_INTERACTION -eq 1 ] && return 0
+
   printf "Continue (y/N)? "
   read -r cont
 
@@ -53,14 +64,12 @@ local_path() { echo "$1" | sed -E 's|^[^/]*/(.*)$|\1|'; }
 
 uninstall_file() { maybe_exec rm "$2/$(local_path $1)"; }
 install_file() {
-  [ ! -d `dirname "$2"` ] && maybe_exec mkdir -p `dirname "$2"`
-  maybe_exec ln -s "$1" "$2/$(local_path $1)"
+  dest=`dirname "$2/$(local_path $1)"`
+  [ ! -d "$dest" ] && maybe_exec mkdir -p "$dest"
+  maybe_exec ln -s "$INSTALL_ROOT/$1" "$dest"
 }
 
-# Lists all files/folders matching the regex pattern
-list_files() {
-  find "$1" -d -type f
-}
+list_files() { find "$1" -d -type f; find "$1" -d -type l; }
 
 
 ## START
@@ -69,11 +78,14 @@ list_files() {
 # Runtime options defaults
 DRY_RUN=0
 UNINSTALL=0
+NO_INTERACTION=0
 
 # Parse command-line arguments
 while [ -n "$1" ]; do
   arg="$1"; shift;
   case "$arg" in
+    "-h" | "--help") usage ;;
+    "--no-interaction") NO_INTERACTION=1 ;;
     "--dry-run") DRY_RUN=1; ;;
     "-u" | "--uninstall") UNINSTALL=1; ;;
     *) log_error "unknown argument $arg"; usage ;;
@@ -90,7 +102,8 @@ fi
 # The current working directory (of this script)
 INSTALL_ROOT=$(cd -- "$(dirname -- "$0" )" && pwd -P)
 
-IGNORE_FILES=".gitignore .DS_Store .swp"
+# '|' separated list of files to ignore
+IGNORE_FILES=".DS_Store|.swp"
 
 # Configure the installer locations
 INSTALL_LOCATIONS=$(cat <<EOF
@@ -128,6 +141,10 @@ for config in $INSTALL_LOCATIONS; do
   done
 done
 
-[ $UNINSTALL -eq 1 ] && log_warn "Some folders may be empty and still exist. They will need to be manually deleted."
+if [ $UNINSTALL -eq 1 ]; then
+  log_warn "Some folders may be empty and still exist. They will need to be manually deleted."
+else
+  log_success "Installation complete. You may need to log out and back in for all changes to take affect."
+fi
 
 # vim: ts=2 sw=2 et

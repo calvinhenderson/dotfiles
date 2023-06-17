@@ -1,16 +1,13 @@
 #!/usr/bin/env sh
 
-export DOTFILES_INSTALL_DIR=$(cat "$HOME/.dotfiles_install_dir" 2>& /dev/null)
-if [ -z "$DOTFILES_INSTALL_DIR" ]; then
-  export DOTFILES_INSTALL_DIR="$HOME"
-fi
-
-export PATH="$DOTFILES_INSTALL_DIR/bin:$PATH"
+export PATH="$HOME/bin:$PATH"
 export EDITOR="nvim"
 
 if [ -z "$XDG_CONFIG_HOME" ]; then
   export XDG_CONFIG_HOME="$HOME/.config"
 fi
+
+export TMUX_PLUGIN_MANAGER_PATH="$XDG_CONFIG_HOME/tmux/plugins"
 
 export ASDF_DIR="$XDG_CONFIG_HOME/asdf"
 

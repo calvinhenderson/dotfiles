@@ -332,7 +332,7 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { "html", "css", "javascript", "typescript", "elixir", "heex", "help", "c", "cpp", "lua",
+  ensure_installed = { "html", "css", "javascript", "typescript", "elixir", "heex", "vimdoc", "c", "cpp", "lua",
     "markdown" },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
