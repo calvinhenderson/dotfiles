@@ -31,7 +31,7 @@ select_project() {
   else
     i=0
     for option in $options 'New Project'; do
-      i=$(bc <<< "$i + 1")
+      i=$(echo "$i + 1" | bc)
       echo "$i. $option"
     done
 

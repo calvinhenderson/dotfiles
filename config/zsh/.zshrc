@@ -56,3 +56,8 @@ fi
 if [ -f "$OHMYZSH_DIR/oh-my-zsh.sh" ]; then
   source "$OHMYZSH_DIR/oh-my-zsh.sh"
 fi
+
+# [[ Init ASDF ]]
+if [ -f "$ASDF_DIR/asdf.sh" ]; then
+  source "$ASDF_DIR/asdf.sh"
+fi

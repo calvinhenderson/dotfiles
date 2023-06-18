@@ -332,8 +332,11 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { "html", "css", "javascript", "typescript", "elixir", "heex", "vimdoc", "c", "cpp", "lua",
+  ensure_installed = { "html", "css", "javascript", "typescript", "elixir", "heex", "help", "vimdoc", "c", "cpp", "lua",
     "markdown" },
+
+  -- Add languages to be ignored
+  ignore_install = { "help", "vimdoc" },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
@@ -682,7 +685,7 @@ local timer = vim.loop.new_timer()
 if timer ~= nil then
   timer:start(0, 2000, vim.schedule_wrap(function()
     local dark_mode = true
-    if vim.fn.has('macunix') then
+    if vim.fn.has('macunix') ~= 0 then
       local system_theme = vim.fn.system { 'defaults', 'read', '-g', 'AppleInterfaceStyle' }
       if not string.find(system_theme, "Dark", 0) then
         dark_mode = false

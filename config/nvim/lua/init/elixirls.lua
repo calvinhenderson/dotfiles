@@ -2,7 +2,7 @@ local elixirls = {}
 
 -- Download base URL
 elixirls.base_url = 'https://github.com/elixir-lsp/elixir-ls/releases/latest/download'
-elixirls.file_template = 'elixir-ls-${ELIXIR_VERSION}-${OTP_VERSION}.zip'
+elixirls.file_template = 'elixir-ls.zip'
 
 -- Configure the local or global path for the language server
 local function setup_path()
@@ -14,10 +14,8 @@ local function setup_path()
 end
 
 -- Get the download url for a specific version of the language server
-local function get_download_url(elixir_version, otp_version)
-  local url = elixirls.base_url .. elixirls.file_template
-  url = string.gsub(url, '${ELIXIR_VERSION}', elixir_version)
-  url = string.gsub(url, '${OTP_VERSION}', otp_version)
+local function get_download_url()
+  local url = elixirls.base_url .. '/' .. elixirls.file_template
   return url
 end
 
@@ -42,16 +40,12 @@ function elixirls.install()
   end
 
   -- Get the currently running Elixir and Erlang/OTP version
-  local version_string = vim.fn.system { 'elixir', '--version' }
-  local _, stop, elixir_ver = string.find(version_string, '([%d%.]+)')
-  local _, _, erlang_ver = string.find(version_string, '([%d%.]+)', stop + 1)
-
   local zip = '/tmp/elixir-ls.zip'
 
   -- Download the language server
   if not vim.loop.fs_stat(zip) then
     print('[elixir-ls] downloading..')
-    download_file(get_download_url(elixir_ver, erlang_ver), zip)
+    download_file(get_download_url(), zip)
   else
     print('[elixir-ls] skipping download. file exists.')
   end

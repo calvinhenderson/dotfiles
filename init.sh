@@ -43,7 +43,7 @@ to_lower() { echo "$1" | tr '[:upper:]' '[:lower:]'; }
 # Executes the command when not a dry-run
 maybe_exec() {
   log_info "$@"
-  [ $DRY_RUN -eq 0 ] && eval -- "$@"
+  [ $DRY_RUN -eq 0 ] && eval "$@"
 }
 
 # Prompts the user to continue.
@@ -69,7 +69,7 @@ install_file() {
   maybe_exec ln -s "$INSTALL_ROOT/$1" "$dest"
 }
 
-list_files() { find "$1" -d -type f; find "$1" -d -type l; }
+list_files() { find "$1" -depth -type f; find "$1" -depth -type l; }
 
 
 ## START
