@@ -1,0 +1,85 @@
+#!/usr/bin/env sh
+
+SEARCH_DIRS="$HOME/Projects/*"
+
+prompt_continue() {
+  if [ -n "$1" ]; then
+    printf "$1 (Y/n)"
+  else
+    printf "Continue (Y/n)"
+  fi
+
+  read -r response
+  case $(echo $response | tr '[:upper:]' '[:lower:]') in
+    "n" | "no") return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+name_session() { basename "$selected" | tr . _; }
+
+select_project() {
+  options="$(ls -1dt $SEARCH_DIRS)"
+
+  if [ $# -eq 1 ]; then
+    selected="$1"
+    selected_name=$(name_session)
+  fi
+
+  if command -v fzf > /dev/null; then
+    selected=$(echo "$options\nNew Project" | fzf)
+  else
+    i=0
+    for option in $options 'New Project'; do
+      i=$(bc <<< "$i + 1")
+      echo "$i. $option"
+    done
+
+    printf "Enter a number: "
+    read -r num
+
+    selected=$(echo "$options\nNew Project" | head -n $num | tail -n 1)
+  fi
+
+  if [ "$selected" = "New Project" ]; then
+    printf "Enter the project name: "; read -r name
+
+    selected="$HOME/Projects/$name"
+
+    mkdir -p "$selected"
+
+    prompt_continue "Make git repo" && {
+      cd "$selected" && git init
+    }
+  fi
+
+  selected_name=$(name_session)
+}
+
+select_project $@
+
+[ -z "$selected" ] && exit 0
+
+pgrep tmux > /dev/null
+if [ $? -ne 0 ] && [ -z $TMUX ]; then
+  # If tmux is not running..
+  # Just create the session and attach.
+  tmux new-session -s $selected_name -c $selected
+  exit 0
+else
+  # If tmux is already running...
+  # Check for an existing session
+  tmux has-session -t=$selected_name 2> /dev/null
+  if [ $? -ne 0 ]; then
+    # Create a new session
+    tmux new-session -ds $selected_name -c $selected
+  fi
+  
+  # Attach/switch
+  if [ -z "$TMUX" ]; then
+    tmux attach-session -dt $selected_name
+  else
+    tmux switch-client -t $selected_name
+  fi
+fi
+
