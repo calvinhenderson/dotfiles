@@ -49,7 +49,9 @@ if echo "$OSTYPE" | grep -e '^.*darwin.*$' > /dev/null; then
     plugins+=(brew macos) # Only install macOS-sepcific plugins here.
   fi
 
-  eval "$(brew shellenv)"
+  if command -v brew > /dev/null; then
+    eval $(brew shellenv)
+  fi
 fi
 
 # [[ Init oh-my-zsh ]]
