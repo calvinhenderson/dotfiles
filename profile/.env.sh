@@ -1,19 +1,12 @@
 #!/usr/bin/env sh
 
+#: {{{ General
+
 export PATH="$HOME/bin:$PATH"
 export EDITOR="nvim"
 
-if [ -z "$XDG_CONFIG_HOME" ]; then
-  export XDG_CONFIG_HOME="$HOME/.config"
-fi
-
-export TMUX_PLUGIN_MANAGER_PATH="$XDG_CONFIG_HOME/tmux/plugins"
-
-export ASDF_DIR="$XDG_CONFIG_HOME/asdf"
-
-if [ "$(basename $SHELL)" = "zsh" ]; then
-  export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
-fi
+#: }}}
+#: {{{ Aliases
 
 # `ls` aliases
 LS="/bin/ls"
@@ -32,9 +25,36 @@ alias vi="nvim"
 alias tn="tmux new-session -s"
 alias ta="tmux attach-session -t"
 alias tl="tmux list-sessions"
+alias ts="tmux-session"
 
 # git aliases
 alias ga="git add"
 alias gc="git commit"
 
-# vim: ts=2 sw=2 expandtab
+#: }}}
+#: {{{ XDG Base Directory
+
+[ -z "$XDG_CONFIG_HOME" ] && export XDG_CONFIG_HOME="$HOME/.config"
+[ -z "$XDG_DATA_HOME" ] && export XDG_DATA_HOME="$HOME/.local/share"
+
+#: }}}
+#: {{{ TMUX
+
+export TMUX_PLUGIN_MANAGER_PATH="$XDG_CONFIG_HOME/tmux/plugins"
+
+#: }}}
+#: {{{ ASDF
+
+export ASDF_DIR="$XDG_CONFIG_HOME/asdf"
+export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
+
+#: }}}
+#: {{{ ZSH
+
+if [ "$(basename $SHELL)" = "zsh" ]; then
+  export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+fi
+
+#: }}}
+
+# vim: ts=2 sw=2 expandtab foldmethod=marker
