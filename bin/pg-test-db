@@ -1,0 +1,44 @@
+#!/usr/bin/env sh
+
+parse_input() { printf %.1s "$1" | tr '[:upper:]' '[:lower:]'; }
+
+init_db() {
+  echo "Initializing database at $PGDATA_DIR"
+  initdb -U postgres -D "$PGDATA_DIR"
+  postgres -D "$PGDATA_DIR" &
+  sleep 3
+  echo "ALTER ROLE postgres PASSWORD 'postgres';" | psql -U postgres
+  kill %1
+}
+
+start_db() {
+  postgres -D "$PGDATA_DIR"
+}
+
+# Get database name
+if [ $# -eq 1 ]; then
+  dbname="$1"
+else
+  dbname="pg-temp-db"
+fi
+
+export PGDATA_DIR="$TMPDIR/$dbname"
+
+if [ -d "$PGDATA_DIR" ]; then
+  echo "The directory $PGDATA_DIR already exists."
+
+  printf "Would you like to delete it? (y/N) "; read -r delete_it
+  if [ "$(parse_input $delete_it)" = "y" ]; then
+    echo "Deleting existing database at $PGDATA_DIR"
+    rm -rf "$PGDATA_DIR"
+    init_db
+  else
+    printf "Would you like to use it? (Y/n) "; read -r use_it
+    [ "$(parse_input $use_it)" = "n" ] && exit 0;
+  fi
+else
+  echo "Creating db at $PGDATA_DIR"
+  init_db
+fi
+
+start_db
