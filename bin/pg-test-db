@@ -15,14 +15,16 @@ start_db() {
   postgres -D "$PGDATA_DIR"
 }
 
-# Get database name
-if [ $# -eq 1 ]; then
-  dbname="$1"
-else
-  dbname="pg-temp-db"
-fi
+if [ -z "$PGDATA_DIR" ]; then
+  # Get database name
+  if [ $# -eq 1 ]; then
+    dbname="$1"
+  else
+    dbname="pg-temp-db"
+  fi
 
-export PGDATA_DIR="$TMPDIR/$dbname"
+  export PGDATA_DIR="$TMPDIR/$dbname"
+fi
 
 if [ -d "$PGDATA_DIR" ]; then
   echo "The directory $PGDATA_DIR already exists."
