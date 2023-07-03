@@ -57,4 +57,9 @@ fi
 
 #: }}}
 
+# Local overrides
+if [ -f "$HOME/.local.env.sh" ]; then
+  source ~/.local.env.sh
+fi
+
 # vim: ts=2 sw=2 expandtab foldmethod=marker

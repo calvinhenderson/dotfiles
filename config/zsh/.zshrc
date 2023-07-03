@@ -1,23 +1,31 @@
 #!/usr/bin/env zsh
 source "$HOME/.env.sh"
 
+OHMYZSH_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
+
+# Prompt to continue
+# Usage: prompt_continue && { yes } || { no }
+prompt_continue() {
+  echo "$1"
+  printf "Continue? (Y/n)"
+  read -r response
+  case `echo "$response" | head -c 1` in
+    "N"|"n")
+      return 1 ;;
+    *)
+      return 0 ;;
+  esac
+}
+
 # [[ Install oh-my-zsh ]]
 if [ ! -d "$ZDOTDIR/ohmyzsh" ] && [ ! -f "$ZDOTDIR/.skip_oh_my_zsh_install" ]; then
-  echo "oh-my-zsh is not installed."
-
-  printf "Install oh-my-zsh? (y/N): "  >&2
-  read -r prompt
-
-  # Maybe run the install script?
-  case `echo "$prompt" | tr '[:upper:]' '[:lower:]'` in
-    "y" | "yes")
-      sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --keep-zshrc
-      ;;
-    *)
-      # Don't prompt again
-      touch "$ZDOTDIR/.skip_oh_my_zsh_install"
-      ;;
-  esac
+  prompt_continue "Oh-my-zsh is not installed. Install?" \
+    && {
+      sh -c "$(curl -fsSL $OHMYZSH_URL)" "" --keep-zshrc
+    } || {
+      echo "Skipping. You will not be prompted again."
+      mkdir -p "$ZDOTDIR" && touch "$ZDOTDIR/.skip_oh_my_zsh_install"
+    }
 fi
 
 # [[ oh-my-zsh Settings ]]
@@ -62,4 +70,14 @@ fi
 # [[ Init ASDF ]]
 if [ -f "$ASDF_DIR/asdf.sh" ]; then
   source "$ASDF_DIR/asdf.sh"
+elif [ ! -z "$ASDF_DIR" ] && [ ! -f $ASDF_DIR/.skip_asdf_install ]; then
+  prompt_continue "ASDF is not installed. Install?" \
+    && {
+      echo "Installing ASDF."
+      git clone https://github.com/asdf-vm/asdf.git $ASDF_DIR
+      source "$ASDF_DIR/asdf.sh"
+    } || {
+      echo "Skipping. You will not be prompted again."
+      mkdir -p "$ASDF_DIR" && touch "$ASDF_DIR/.skip_asdf_install"
+    }
 fi
