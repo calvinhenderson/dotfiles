@@ -31,11 +31,22 @@ alias ts="tmux-session"
 alias ga="git add"
 alias gc="git commit"
 
+# fuzzy `cd` alternatives
+alias sd="cd \$(find \$HOME -type d | fzf)"
+alias sf="cd \$(find \$HOME -type f | fzf | xargs dirname)"
+
 #: }}}
 #: {{{ XDG Base Directory
 
 [ -z "$XDG_CONFIG_HOME" ] && export XDG_CONFIG_HOME="$HOME/.config"
 [ -z "$XDG_DATA_HOME" ] && export XDG_DATA_HOME="$HOME/.local/share"
+
+#: }}}
+#: {{{ ZSH
+
+if [ "$(basename $SHELL)" = "zsh" ]; then
+  export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+fi
 
 #: }}}
 #: {{{ TMUX
@@ -49,17 +60,20 @@ export ASDF_DIR="$XDG_CONFIG_HOME/asdf"
 export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
 
 #: }}}
-#: {{{ ZSH
+#: {{{ Elixir/Mix
 
-if [ "$(basename $SHELL)" = "zsh" ]; then
-  export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
-fi
+export HEX_HOME="$XDG_DATA_HOME/hex"
 
 #: }}}
+#: {{{ Node/npm
 
-# Local overrides
+export npm_config_cache="$XDG_DATA_HOME/npm"
+
+#: }}}
+#: {{{ Local Overrides
 if [ -f "$HOME/.local.env.sh" ]; then
   source ~/.local.env.sh
 fi
+#: }}}
 
 # vim: ts=2 sw=2 expandtab foldmethod=marker
