@@ -35,7 +35,7 @@ if [ -d "$ZDOTDIR/ohmyzsh" ]; then
   export HYPHEN_INSENSITIVE="true"
 
   # [[ ZSH Plugins ]]
-  plugins=(git dotenv docker npm zsh-autosuggestions)
+  plugins=(git dotenv npm zsh-autosuggestions)
 
   if [ ! -d "$OHMYZSH_DIR/plugins/zsh-autosuggestions" ]; then
     [[ "${plugins[*]} " =~ "zsh-autosuggestions" ]] && \

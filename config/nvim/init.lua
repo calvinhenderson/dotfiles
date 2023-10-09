@@ -221,7 +221,7 @@ require('lazy').setup({
 -- [[ Settings ]]
 -- See `:help vim.o`
 
-vim.cmd.colorscheme 'catppuccin'
+vim.cmd.colorscheme 'catppuccin-frappe'
 
 -- Set highlight on search
 vim.o.hlsearch = false
@@ -468,9 +468,9 @@ end
 --  https://github.com/williamboman/mason-lspconfig.nvim#available-lsp-servers
 local servers = {
   -- misc
-  clangd = {},
-  jsonls = {},
-  remark_ls = {},
+  -- clangd = {},
+  -- jsonls = {},
+  -- remark_ls = {},
   -- elixir
   elixirls = {
     cmd = { vim.fn.expand(require 'init.elixirls'.install() .. "/language_server.sh") },
@@ -481,11 +481,11 @@ local servers = {
     }
   },
   -- web
-  html = {},
-  eslint = {},
-  cssls = {},
-  svelte = {},
-  tsserver = {},
+  -- html = {},
+  -- eslint = {},
+  -- cssls = {},
+  -- svelte = {},
+  -- tsserver = {},
   tailwindcss = {
     filetypes = { "html", "elixir", "eelixir", "heex" },
     init_options = {
@@ -504,9 +504,9 @@ local servers = {
     },
   },
   -- docker
-  dockerls = {},
-  docker_compose_language_service = {},
-  yamlls = {},
+  -- dockerls = {},
+  -- docker_compose_language_service = {},
+  -- yamlls = {},
   lua_ls = {
     settings = {
       Lua = {
@@ -681,9 +681,16 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 })
 
 -- Theme toggle
+vim.g.autodark = 0
+vim.o.background = 'dark'
 local timer = vim.loop.new_timer()
 if timer ~= nil then
   timer:start(0, 2000, vim.schedule_wrap(function()
+    -- Early return if disabled
+    if vim.g.autodark ~= 1 then
+      return
+    end
+
     local dark_mode = true
     if vim.fn.has('macunix') ~= 0 then
       local system_theme = vim.fn.system { 'defaults', 'read', '-g', 'AppleInterfaceStyle' }

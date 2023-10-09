@@ -2,7 +2,7 @@ local elixirls = {}
 
 -- Download base URL
 elixirls.base_url = 'https://github.com/elixir-lsp/elixir-ls/releases/latest/download'
-elixirls.file_template = 'elixir-ls.zip'
+elixirls.file_template = 'elixir-ls-v0.16.0.zip'
 
 -- Configure the local or global path for the language server
 local function setup_path()
