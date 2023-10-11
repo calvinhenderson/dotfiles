@@ -68,16 +68,26 @@ if [ -f "$OHMYZSH_DIR/oh-my-zsh.sh" ]; then
 fi
 
 # [[ Init ASDF ]]
-if [ -f "$ASDF_DIR/asdf.sh" ]; then
-  source "$ASDF_DIR/asdf.sh"
-elif [ ! -z "$ASDF_DIR" ] && [ ! -f $ASDF_DIR/.skip_asdf_install ]; then
+if [ ! -z "$ASDF_DIR" ] \
+  && [ ! -f $ASDF_DIR/.skip_asdf_install ] \
+  && [ ! -f "$ASDF_DIR/asdf.sh" ]
+then
   prompt_continue "ASDF is not installed. Install?" \
     && {
       echo "Installing ASDF."
       git clone https://github.com/asdf-vm/asdf.git $ASDF_DIR
-      source "$ASDF_DIR/asdf.sh"
     } || {
       echo "Skipping. You will not be prompted again."
       mkdir -p "$ASDF_DIR" && touch "$ASDF_DIR/.skip_asdf_install"
     }
 fi
+
+# Load ASDF completions
+if [ -f "$ASDF_DIR/asdf.sh" ]; then
+  source "$ASDF_DIR/asdf.sh"
+  if [ -d "$ASDF_DIR/completions" ]; then
+    fpath=($ASDF_DIR/completions $fpath)
+    autoload -Uz compinit && compinit
+  fi
+fi
+
