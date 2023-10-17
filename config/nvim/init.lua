@@ -467,11 +467,6 @@ end
 -- A list of server names can be found here:
 --  https://github.com/williamboman/mason-lspconfig.nvim#available-lsp-servers
 local servers = {
-  -- misc
-  -- clangd = {},
-  -- jsonls = {},
-  -- remark_ls = {},
-  -- elixir
   elixirls = {
     cmd = { vim.fn.expand(require 'init.elixirls'.install() .. "/language_server.sh") },
     elixirLS = {
@@ -480,12 +475,6 @@ local servers = {
       signatureAfterComplete = true
     }
   },
-  -- web
-  -- html = {},
-  -- eslint = {},
-  -- cssls = {},
-  -- svelte = {},
-  -- tsserver = {},
   tailwindcss = {
     filetypes = { "html", "elixir", "eelixir", "heex" },
     init_options = {
@@ -503,10 +492,6 @@ local servers = {
       },
     },
   },
-  -- docker
-  -- dockerls = {},
-  -- docker_compose_language_service = {},
-  -- yamlls = {},
   lua_ls = {
     settings = {
       Lua = {
@@ -542,7 +527,8 @@ mason_lspconfig.setup_handlers {
       single_file_support = true,
     }
 
-    require('lspconfig')[server_name].setup(vim.tbl_extend("force", lsp_options, servers[server_name]))
+    local server_opts = servers[server_name] or {}
+    require('lspconfig')[server_name].setup(vim.tbl_extend("force", lsp_options, server_opts))
   end,
 }
 
