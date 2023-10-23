@@ -1,6 +1,10 @@
 #!/usr/bin/env sh
 
 SEARCH_DIRS="$HOME/Projects/* $HOME/Documents/Projects/*"
+TMUX_SESSION_ICON="󰖯"
+DIRECTORY_ICON="󰉋"
+GIT_REPO_ICON="󰊢"
+CUSTOM_COMMAND_ICON=""
 
 prompt_continue() {
   if [ -n "$1" ]; then
@@ -16,70 +20,100 @@ prompt_continue() {
   esac
 }
 
-name_session() { basename "$selected" | tr . _; }
+name_session() { basename "$1" | tr . _; }
+
+# args: session_name
+attach_session() {
+  if [ -z "$TMUX" ]; then
+    tmux attach-session -dt "$1"
+  else
+    tmux switch-client -t "$1"
+  fi
+}
+
+# args: dir
+create_and_attach_session() {
+  session_name=$(name_session "$1")
+  tmux new-session -ds "$session_name" -c "$1"
+  attach_session "$session_name"
+}
 
 select_project() {
-  options="$(ls -1dt $SEARCH_DIRS)"
+  # Get a list of active tmux sessions
+  sessions="$(if tmux run 2> /dev/null; then tmux list-sessions | awk -F: '{print $1}'; fi)"
+
+  # Combine the sessions and project directories lists
+  options=$({
+      printf "$sessions\n"
+      ls -1dt $SEARCH_DIRS 2>/dev/null
+      printf "New Project"
+    } | tr '\n' ':' | sed -e 's/^://')
+
+  # Rice the options list before displaying to the user
+  display_options=""
+  IFS=$':'; for option in $options; do
+    if case "$sessions" in *"$option"*) true;; *) false;; esac; then
+      prefix="$TMUX_SESSION_ICON"
+    elif [ -d "$option/.git" ]; then
+      prefix="$GIT_REPO_ICON"
+    elif [ -d "$option" ]; then
+      prefix="$DIRECTORY_ICON"
+    else
+      prefix="$CUSTOM_COMMAND_ICON"
+    fi
+    display_options="$display_options$prefix $option\n"
+  done
 
   if [ $# -eq 1 ]; then
-    selected="$1"
-    selected_name=$(name_session)
+    create_and_attach_session "$1"
+    return 0
   fi
 
+  nr=""
   if command -v fzf > /dev/null; then
-    selected=$(echo "$options\nNew Project" | fzf)
+    selected_row=$(echo $display_options | fzf)
+    nr=$(echo $display_options | grep -Fn "$selected_row" | awk -F: '{print $1}')
   else
     i=0
-    for option in $options 'New Project'; do
+    for option in "${display_options}"; do
       i=$(echo "$i + 1" | bc)
       echo "$i. $option"
     done
 
     printf "Enter a number: "
-    read -r num
-
-    selected=$(echo "$options\nNew Project" | head -n $num | tail -n 1)
+    read -r nr
   fi
 
-  if [ "$selected" = "New Project" ]; then
-    printf "Enter the project name: "; read -r name
+  selected_name=$(echo "$options" | cut -d':' -f${nr})
 
-    selected="$HOME/Projects/$name"
+  case "$selected_row" in
+    "$TMUX_SESSION_ICON"*)
+      # Attach to an existing tmux session
+      attach_session "$selected_name";;
+    "$GIT_REPO_ICON"*|"$DIRECTORY_ICON"*)
+      # Create a new session for the repo/directory
+      create_and_attach_session "$selected_name";;
+    *"New Project")
+      # Create a new project
+      printf "Enter the project name: "; read -r name
 
-    mkdir -p "$selected"
+      selected="$HOME/Projects/$name"
 
-    prompt_continue "Make git repo" && {
-      cd "$selected" && git init
-    }
-  fi
+      mkdir -p "$selected_name"
 
-  selected_name=$(name_session)
+      # Optionally, initilize a git repository
+      prompt_continue "Make git repo" && {
+        cd "$selected_name" && git init
+      }
+
+      # Create a new tmux session and attach
+      create_and_attach_session "$selected_name"
+      ;;
+    *)
+      echo "no selection was made. exiting."
+      exit 0
+      ;;
+  esac
 }
 
 select_project $@
-
-[ -z "$selected" ] && exit 0
-
-pgrep tmux > /dev/null
-if [ $? -ne 0 ] && [ -z $TMUX ]; then
-  # If tmux is not running..
-  # Just create the session and attach.
-  tmux new-session -s $selected_name -c $selected
-  exit 0
-else
-  # If tmux is already running...
-  # Check for an existing session
-  tmux has-session -t=$selected_name 2> /dev/null
-  if [ $? -ne 0 ]; then
-    # Create a new session
-    tmux new-session -ds $selected_name -c $selected
-  fi
-  
-  # Attach/switch
-  if [ -z "$TMUX" ]; then
-    tmux attach-session -dt $selected_name
-  else
-    tmux switch-client -t $selected_name
-  fi
-fi
-
