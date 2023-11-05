@@ -97,8 +97,7 @@ select_project() {
       # Create a new project
       printf "Enter the project name: "; read -r name
 
-      selected="$HOME/Projects/$name"
-
+      selected_name="$HOME/Projects/$name"
       mkdir -p "$selected_name"
 
       # Optionally, initilize a git repository
