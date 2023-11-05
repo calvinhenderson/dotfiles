@@ -248,6 +248,12 @@ vim.o.breakindent = true
 -- Enable smart indentation
 vim.o.indentexpr = 'autoindent'
 
+-- Highlight column 80
+vim.o.colorcolumn = "80"
+
+-- Disable line wrapping
+vim.o.wrap = false
+
 -- Save undo history
 vim.o.undofile = true
 
