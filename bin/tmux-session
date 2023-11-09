@@ -46,13 +46,14 @@ select_project() {
   options=$({
       printf "$sessions\n"
       ls -1dt $SEARCH_DIRS 2>/dev/null
-      printf "New Project"
+      echo "Clone Repository"
+      echo "New Project"
     } | tr '\n' ':' | sed -e 's/^://')
 
   # Rice the options list before displaying to the user
   display_options=""
   IFS=$':'; for option in $options; do
-    if case "$sessions" in *"$option"*) true;; *) false;; esac; then
+    if [[ "$sessions" =~ ^.*$option.*$ ]]; then
       prefix="$TMUX_SESSION_ICON"
     elif [ -d "$option/.git" ]; then
       prefix="$GIT_REPO_ICON"
@@ -93,6 +94,25 @@ select_project() {
     "$GIT_REPO_ICON"*|"$DIRECTORY_ICON"*)
       # Create a new session for the repo/directory
       create_and_attach_session "$selected_name";;
+    *"Clone Repository")
+      printf "Enter the git clone URL: "; read -r clone_url
+
+      name=$(
+        echo "$clone_url" \
+        | egrep -o '[^\/:\.]*(\.git)?$' \
+        | cut -f1 -d'.' \
+        | tr ':/' '_'
+      )
+
+      printf "Enter the project name (default $name): "; read -r in_name
+      [ -n "$in_name" ] && name="$in_name"
+
+      selected="$HOME/Projects/$name"
+
+      git clone "$clone_url" "$selected"
+
+      create_and_attach_session "$selected"
+      ;;
     *"New Project")
       # Create a new project
       printf "Enter the project name: "; read -r name
