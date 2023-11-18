@@ -73,7 +73,7 @@ select_project() {
   nr=""
   if command -v fzf > /dev/null; then
     selected_row=$(echo $display_options | fzf)
-    nr=$(echo $display_options | grep -Fn "$selected_row" | awk -F: '{print $1}')
+    nr=$(echo $display_options | grep -n "$selected_row$" | awk -F: '{print $1}')
   else
     i=0
     for option in "${display_options}"; do
