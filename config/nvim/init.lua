@@ -115,23 +115,7 @@ require('lazy').setup({
     },
   },
 
-  {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    -- config = function()
-    --   vim.cmd.colorscheme 'onedark'
-    -- end,
-    opts = {
-      style = 'warmer',
-      term_colors = true,
-      lualine = {
-        transparent = true,
-      },
-    },
-  },
-
-  { 'catppuccin/nvim',      as = 'catppuccin' },
+  { 'morhetz/gruvbox',      as = 'gruvbox' },
 
   {
     -- Set lualine as statusline
@@ -221,7 +205,7 @@ require('lazy').setup({
 -- [[ Settings ]]
 -- See `:help vim.o`
 
-vim.cmd.colorscheme 'catppuccin-frappe'
+vim.cmd.colorscheme 'gruvbox'
 
 -- Set highlight on search
 vim.o.hlsearch = false
