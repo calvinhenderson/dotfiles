@@ -114,6 +114,8 @@ select_project() {
 
       git clone "$clone_url" "$selected"
 
+      [ $? -ne 0 ] && select_project "$selected_row"
+
       create_and_attach_session "$selected"
       ;;
     *"New Project")
