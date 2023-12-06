@@ -76,7 +76,6 @@ select_project() {
   if command -v fzf > /dev/null; then
     selected_row=$(echo $display_options | fzf)
     [ $? -ne 0 ] && exit 0
-    nr=$(echo $display_options | grep -n "$selected_row$" | awk -F: '{print $1}')
   else
     i=0
     echo "$display_options" | while read -r option; do
@@ -86,17 +85,16 @@ select_project() {
 
     printf "Enter a number: "
     read -r nr
+    selected_row=$(echo $display_options | head -n${nr} | tail -n1 | sed 's/^[0-9]\+\.//')
   fi
-
-  selected_name=$(echo "$options" | cut -d':' -f${nr})
 
   case "$selected_row" in
     "$TMUX_SESSION_ICON"*)
       # Attach to an existing tmux session
-      attach_session "$selected_name";;
+      attach_session "$selected_row";;
     "$GIT_REPO_ICON"*|"$DIRECTORY_ICON"*)
       # Create a new session for the repo/directory
-      create_and_attach_session "$selected_name";;
+      create_and_attach_session "$selected_row";;
     *"Clone Repository")
       printf "Enter the git clone URL: "; read -r clone_url
 
