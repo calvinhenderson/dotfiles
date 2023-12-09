@@ -31,9 +31,19 @@ attach_session() {
   fi
 }
 
+# args: "icon project_path"
+maybe_strip_icon_prefix() {
+  echo "$1" | sed \
+    -e "s/^$TMUX_SESSION_ICON[[:space:]]*//" \
+    -e "s/^$DIRECTORY_ICON[[:space:]]*//" \
+    -e "s/^$GIT_REPO_ICON[[:space:]]*//" \
+    -e "s/^$CUSTOM_COMMAND_ICON[[:space:]]*//"
+}
+
 # args: dir
 create_and_attach_session() {
   session_name=$(name_session "$1")
+  echo "$session_dir"
   tmux new-session -ds "$session_name" -c "$1"
   attach_session "$session_name"
 }
@@ -88,13 +98,15 @@ select_project() {
     selected_row=$(echo $display_options | head -n${nr} | tail -n1 | sed 's/^[0-9]\+\.//')
   fi
 
+  selected_name=$(maybe_strip_icon_prefix "$selected_row")
+
   case "$selected_row" in
     "$TMUX_SESSION_ICON"*)
       # Attach to an existing tmux session
-      attach_session "$selected_row";;
+      attach_session "$selected_name";;
     "$GIT_REPO_ICON"*|"$DIRECTORY_ICON"*)
       # Create a new session for the repo/directory
-      create_and_attach_session "$selected_row";;
+      create_and_attach_session "$selected_name";;
     *"Clone Repository")
       printf "Enter the git clone URL: "; read -r clone_url
 
