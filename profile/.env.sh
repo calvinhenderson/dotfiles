@@ -30,6 +30,7 @@ alias ts="tmux-session"
 # git aliases
 alias ga="git add"
 alias gc="git commit"
+alias lg="lazygit"
 
 # fuzzy `cd` alternatives
 alias sd="cd \$(find \$HOME -type d | fzf)"
