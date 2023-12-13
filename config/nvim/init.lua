@@ -639,8 +639,8 @@ local fterm = require 'FTerm'
 fterm.setup {
   cmd = os.getenv('SHELL') ~= '' and os.getenv('SHELL') or '/bin/bash',
   border = 'single',
-  auto_close = false,
-  blend = 30,
+  auto_close = true,
+  blend = 0,
   dimensions = {
     height = 0.8,
     width = 0.8,

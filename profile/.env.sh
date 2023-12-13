@@ -36,6 +36,9 @@ alias lg="lazygit"
 alias sd="cd \$(find \$HOME -type d | fzf)"
 alias sf="cd \$(find \$HOME -type f | fzf | xargs dirname)"
 
+# mix aliases
+alias hxi="mix hex.info"
+
 #: }}}
 #: {{{ XDG Base Directory
 
