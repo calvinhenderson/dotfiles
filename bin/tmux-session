@@ -6,6 +6,9 @@ DIRECTORY_ICON="󰉋"
 GIT_REPO_ICON="󰊢"
 CUSTOM_COMMAND_ICON=""
 
+# Reference to the script location
+myself=$(basename "$0")
+
 prompt_continue() {
   if [ -n "$1" ]; then
     printf "$1 (Y/n)"
@@ -20,6 +23,13 @@ prompt_continue() {
   esac
 }
 
+trim_prefix() {
+  echo "$@" | sed \
+    -e "s/^$TMUX_SESSION_ICON *//" \
+    -e "s/^$DIRECTORY_ICON *//" \
+    -e "s/^$GIT_REPO_ICON *//" \
+    -e "s/^$CUSTOM_COMMAND_ICON *//"
+}
 name_session() { basename "$1" | tr . _; }
 
 # args: session_name
@@ -31,19 +41,9 @@ attach_session() {
   fi
 }
 
-# args: "icon project_path"
-maybe_strip_icon_prefix() {
-  echo "$1" | sed \
-    -e "s/^$TMUX_SESSION_ICON[[:space:]]*//" \
-    -e "s/^$DIRECTORY_ICON[[:space:]]*//" \
-    -e "s/^$GIT_REPO_ICON[[:space:]]*//" \
-    -e "s/^$CUSTOM_COMMAND_ICON[[:space:]]*//"
-}
-
 # args: dir
 create_and_attach_session() {
   session_name=$(name_session "$1")
-  echo "$session_dir"
   tmux new-session -ds "$session_name" -c "$1"
   attach_session "$session_name"
 }
@@ -56,9 +56,15 @@ select_project() {
   options=$({
       printf "$sessions\n"
       ls -1dt $SEARCH_DIRS 2>/dev/null
+      if ! echo "$sessions" | grep "$(name_session "$DOTFILES_DIR")" >/dev/null; then
+        echo "Dotfiles"
+      fi
       echo "Clone Repository"
       echo "New Project"
     } | tr '\n' ':' | sed -e 's/^://')
+
+  dotfiles_session=$(name_session "$DOTFILES_DIR")
+  echo "$sessions" | grep "$dotfiles_session"
 
   # Rice the options list before displaying to the user
   display_options=""
@@ -98,15 +104,22 @@ select_project() {
     selected_row=$(echo $display_options | head -n${nr} | tail -n1 | sed 's/^[0-9]\+\.//')
   fi
 
-  selected_name=$(maybe_strip_icon_prefix "$selected_row")
+  selected_name=$(trim_prefix "$selected_row")
 
   case "$selected_row" in
     "$TMUX_SESSION_ICON"*)
       # Attach to an existing tmux session
-      attach_session "$selected_name";;
+      attach_session "$(name_session "$selected_name")" ;;
     "$GIT_REPO_ICON"*|"$DIRECTORY_ICON"*)
       # Create a new session for the repo/directory
-      create_and_attach_session "$selected_name";;
+      create_and_attach_session "$selected_name" ;;
+    *"Dotfiles")
+      [ -z "$DOTFILES_DIR" ] && {
+        echo "DOTFILES_DIR is not set in the environment."
+        printf "Enter the path: "; read -r DOTFILES_DIR
+      }
+      create_and_attach_session "$DOTFILES_DIR"
+      ;;
     *"Clone Repository")
       printf "Enter the git clone URL: "; read -r clone_url
 
@@ -124,9 +137,13 @@ select_project() {
 
       git clone "$clone_url" "$selected"
 
-      [ $? -ne 0 ] && select_project "$selected_row"
-
-      create_and_attach_session "$selected"
+      [ $? -eq 0 ] && {
+        create_and_attach_session "$selected"
+      } || {
+        echo "Press [enter] to continue."
+        read -r _ignored
+        exec "$myself"
+      }
       ;;
     *"New Project")
       # Create a new project
