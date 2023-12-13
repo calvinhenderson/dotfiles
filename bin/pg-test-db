@@ -22,7 +22,7 @@ init_podman_db() {
   [ $(podman machine ls | grep "Currently running" | wc -l) -gt 0 ] && podman_running=1
 
   # Stop the currently running container and exit
-  if [ $podman_running ] && [ $KILL_CONTAINER ]; then
+  if [ $podman_running ] && [ $KILL_CONTAINER -ne 0 ]; then
     podman container stop "$CONTAINER_NAME"
     exit 0
   fi
