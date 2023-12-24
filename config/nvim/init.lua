@@ -287,12 +287,31 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
+
+local function close_selection(prompt_bufnr)
+  local action_state = require('telescope.actions.state')
+  local picker = action_state.get_current_picker(prompt_bufnr)
+  picker:delete_selection(function(buf)
+    return vim.api.nvim_buf_delete(buf.bufnr, {})
+  end)
+  return true
+end
+
 require('telescope').setup {
   defaults = {
     mappings = {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
+      },
+    },
+  },
+  pickers = {
+    buffers = {
+      mappings = {
+        i = {
+          ['<C-w>'] = close_selection,
+        },
       },
     },
   },
