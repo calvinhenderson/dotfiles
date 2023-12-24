@@ -139,6 +139,11 @@ for config in $INSTALL_LOCATIONS; do
       install_file "$file" "$DST"
     fi
   done
+
+  # Write install location to local.env.sh
+  [ -z "$DOTFILES_DIR" ] && {
+    echo "export DOTFILES_DIR=\"$INSTALL_ROOT\"" >> $HOME/.local.env.sh
+  }
 done
 
 if [ $UNINSTALL -eq 1 ]; then
