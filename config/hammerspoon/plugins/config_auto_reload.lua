@@ -1,3 +1,5 @@
+-- This plugin automatically reloads the config when a file changes.
+
 function reloadConfig(files)
   local doReload = false
   for _, file in pairs(files) do
