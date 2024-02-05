@@ -1,5 +1,5 @@
 -- Auto-load the plugins directory
-plugin_dir = require("util.paths").config_root .. "/plugins"
+local plugin_dir = require("util.paths").config_root .. "/plugins"
 for file in hs.fs.dir(plugin_dir) do
   if file:sub(-4) == ".lua" then
     print("Loading plugin " .. file)
