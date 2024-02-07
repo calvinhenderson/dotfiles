@@ -664,6 +664,7 @@ end
 
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 vim.keymap.set('n', '<leader>tt', require('nvim-tree.api').tree.toggle, { desc = '[T]ree [T]oggle' })
+vim.keymap.set('n', '<leader>tb', require('nvim-tree.api').tree.find_file, { desc = 'Open [T]ree for [B]uffer' })
 
 -- FTerm setup
 local fterm = require 'FTerm'
