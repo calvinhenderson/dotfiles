@@ -1,6 +1,9 @@
 -- This plugin provides a popup window switcher
 -- similar to the file switchers in most editors.
 
+-- Stores the currently focused window to ensure it is last in the list
+local focused_window = nil
+
 -- Gets the icon for an application from its bundle.
 local function getApplicationIcon(application)
   return hs.image.imageFromAppBundle(application:bundleID())
@@ -13,14 +16,21 @@ local function chooseWindow(choice)
     return
   end
 
-  hs.window.get(choice.uuid):focus()
-end
+  local window = hs.window.get(choice.uuid)
+  local spaces = hs.spaces.windowSpaces(window)
 
--- Configure a window filter for retrieving sorted windows
-local window_filter = hs.window.filter.new(false)
-window_filter:setDefaultFilter()
-window_filter:setSortOrder(hs.window.filter.sortByFocusedLast)
-local focused_window = nil
+  -- This is required when switching to applications
+  -- with multiple windows across spaces
+  window:becomeMain()
+  hs.timer.usleep(1000)
+
+  if #spaces > 0 and hs.spaces.focusedSpace() ~= spaces[1] then
+    hs.spaces.gotoSpace(spaces[1])
+  end
+
+  -- Finally, focus the selected window
+  window:focus()
+end
 
 -- Returns the chooser meta for the specified window
 local function getWindowChooserMeta(window)
@@ -34,6 +44,12 @@ end
 
 -- Returns a sorted list of recent windows
 local function getWindows()
+  -- Configure a window filter for retrieving sorted windows
+  local window_filter = hs.window.filter.new(false)
+  window_filter:setDefaultFilter()
+  window_filter:setCurrentSpace(nil)
+  window_filter:setSortOrder(hs.window.filter.sortByFocusedLast)
+
   local choices = {}
   for _, window in ipairs(window_filter:getWindows()) do
     -- Skip adding the focused window
@@ -62,6 +78,7 @@ windowSwitcher:choices(getWindows)
 hs.hotkey.bind({ "cmd", "alt", "ctrl" }, "w", function()
   -- Reset the query text
   focused_window = hs.window.frontmostWindow()
+  windowSwitcher:choices(getWindows)
   windowSwitcher:query("")
   windowSwitcher:show()
 end)
