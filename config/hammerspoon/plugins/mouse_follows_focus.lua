@@ -13,3 +13,6 @@ end
 
 local focusFilter = hs.window.filter.new(false):setDefaultFilter()
 focusFilter:subscribe(hs.window.filter.windowFocused, moveMouse)
+
+-- Add a leader combo to manually set the mouse position
+require("plugins.leader_key"):bind({}, "m", moveMouse)

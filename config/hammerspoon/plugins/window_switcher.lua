@@ -75,7 +75,7 @@ end
 windowSwitcher:searchSubText(true)
 windowSwitcher:choices(getWindows)
 
-hs.hotkey.bind({ "cmd", "alt", "ctrl" }, "w", function()
+require("plugins.leader_key"):bind({}, "w", function()
   -- Reset the query text
   focused_window = hs.window.frontmostWindow()
   windowSwitcher:choices(getWindows)

@@ -16,4 +16,5 @@ hs.grid.HINTS = {
 }
 
 hs.grid.setMargins({ 0, 0 })
-hs.hotkey.bind({ "cmd", "alt", "ctrl" }, "g", hs.grid.show)
+
+require("plugins.leader_key"):bind({}, "g", hs.grid.show)

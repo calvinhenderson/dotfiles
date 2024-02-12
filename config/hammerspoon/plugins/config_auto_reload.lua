@@ -12,5 +12,5 @@ function reloadConfig(files)
   end
 end
 
-config_watcher = hs.pathwatcher.new(require("../util.paths").config_root, reloadConfig):start()
+config_watcher = hs.pathwatcher.new(require("../config").config_root, reloadConfig):start()
 hs.notify.show("Hammerspoon", "Reading config", "")
