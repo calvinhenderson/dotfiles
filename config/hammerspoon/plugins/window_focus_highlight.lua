@@ -3,12 +3,13 @@ local frameFocusCanvas = nil
 
 local function updateFocusFrame(_window, _app_name, _event)
   frameFocusCanvas:frame(hs.window.frontmostWindow():frame())
+  frameFocusCanvas:show()
 end
 
 local element = {
   type = "rectangle",
   action = "stroke",
-  strokeColor = { red = 0.3, green = 1.0 },
+  strokeColor = { red = 1.0, green = 0.6, blue = 0.2 },
   strokeWidth = 8,
   roundedRectRadii = { xRadius = 10.0, yRadius = 10.0 }
 }
@@ -17,7 +18,23 @@ frameFocusCanvas = hs.canvas.new(hs.window.frontmostWindow():frame())
 frameFocusCanvas:assignElement(element, 1)
 frameFocusCanvas:show()
 
+local events = {
+  hs.window.filter.windowCreated,
+  hs.window.filter.windowDestroyed,
+  hs.window.filter.windowFocused,
+  hs.window.filter.windowFullscreened,
+  hs.window.filter.windowHidden,
+  hs.window.filter.windowMinimized,
+  hs.window.filter.windowMoved,
+  hs.window.filter.windowUnfocused,
+  hs.window.filter.windowUnfullscreened,
+  hs.window.filter.windowUnhidden,
+  hs.window.filter.windowUnminimized,
+  hs.window.filter.windowVisible,
+}
+
 frameFocusFilter = hs.window.filter.new(false)
 frameFocusFilter:setDefaultFilter()
-frameFocusFilter:subscribe(hs.window.filter.windowFocused, updateFocusFrame)
-frameFocusFilter:subscribe(hs.window.filter.windowMoved, updateFocusFrame)
+frameFocusFilter:subscribe(events, updateFocusFrame)
+
+updateFocusFrame()
