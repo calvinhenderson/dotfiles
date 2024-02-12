@@ -1,7 +1,8 @@
 -- Configures a popup for grid-based window move/resize
+local leader = require("plugins.leader_key")
 
 hs.grid.setGrid('8x4')
-
+hs.grid.setMargins({ 5, 5 })
 
 -- HINTS must contain at least 5 rows.
 -- Even if you are only using 3.. -\_(*_*)_/-
@@ -16,6 +17,15 @@ hs.grid.HINTS = {
   { 'v',  'w',  'd',  'j',  'b',  'h',  '/',  '.' },
 }
 
-hs.grid.setMargins({ 0, 0 })
+local function fitWindows()
+  for _, window in pairs(hs.window.visibleWindows()) do
+    if window:subrole() == "AXWindow" then
+      hs.grid.snap(window)
+    end
+  end
+end
 
-require("plugins.leader_key"):bind({}, "g", hs.grid.show)
+leader:bind({}, "g", hs.grid.show)
+leader:bind({}, "s", fitWindows)
+
+fitWindows()
