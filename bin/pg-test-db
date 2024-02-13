@@ -1,58 +1,46 @@
 #!/usr/bin/env sh
 
-# Default arguments
-[ -z "$CONTAINER_NAME"    ] && CONTAINER_NAME="pg-test-db"
-[ -z "$POSTGRES_VERSION"  ] && POSTGRES_VERSION="latest"
-[ -z "$POSTGRES_PASSWORD" ] && POSTGRES_PASSWORD="postgres"
-KILL_CONTAINER=0
+parse_input() { printf %.1s "$1" | tr '[:upper:]' '[:lower:]'; }
 
-parse_args() {
-  while getopts ':n:v:k' opt; do
-    case "$opt" in
-      n) CONTAINER_NAME="$2"; shift ;;
-      v) POSTGRES_VERSION="$2"; shift ;;
-      k) KILL_CONTAINER=1; ;;
-      *) echo "unknown option \"$1\" given."; exit 1; ;;
-    esac
-  done
+init_db() {
+  echo "Initializing database at $PGDATA_DIR"
+  initdb -U postgres -D "$PGDATA_DIR"
+  postgres -D "$PGDATA_DIR" &
+  sleep 3
+  echo "ALTER ROLE postgres PASSWORD 'postgres';" | psql -U postgres
+  kill %1
 }
 
-init_podman_db() {
-  podman_running=0
-  [ $(podman machine ls | grep "Currently running" | wc -l) -gt 0 ] && podman_running=1
+start_db() {
+  postgres -D "$PGDATA_DIR"
+}
 
-  # Stop the currently running container and exit
-  if [ $podman_running ] && [ $KILL_CONTAINER -ne 0 ]; then
-    podman container stop "$CONTAINER_NAME"
-    exit 0
-  fi
-
-  # Start podman if it isn't running
-  [ $podman_running ] || podman machine start
-
-  # Fetch the correct image
-  podman image pull "docker.io/postgres:$POSTGRES_VERSION"
-
-  # Check if the container already exists
-  if podman container exists "$CONTAINER_NAME"; then
-    printf "Container \"$CONTAINER_NAME\" already exists. Use it? (Y/n) "
-    read -r use_container
-    case "$use_container" in
-      n*)
-        echo "Remove the container or use a different name. Exiting."
-        exit 0
-        ;;
-      *);;
-    esac
-
-    podman container start "$CONTAINER_NAME"
+if [ -z "$PGDATA_DIR" ]; then
+  # Get database name
+  if [ $# -eq 1 ]; then
+    dbname="$1"
   else
-    podman run -dt \
-      --name "$CONTAINER_NAME" \
-      -e "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" \
-      -p 5432:5432 \
-      "postgres:$POSTGRES_VERSION"
+    dbname="pg-temp-db"
   fi
-}
 
-parse_args && init_podman_db
+  export PGDATA_DIR="$TMPDIR/$dbname"
+fi
+
+if [ -d "$PGDATA_DIR" ]; then
+  echo "The directory $PGDATA_DIR already exists."
+
+  printf "Would you like to delete it? (y/N) "; read -r delete_it
+  if [ "$(parse_input $delete_it)" = "y" ]; then
+    echo "Deleting existing database at $PGDATA_DIR"
+    rm -rf "$PGDATA_DIR"
+    init_db
+  else
+    printf "Would you like to use it? (Y/n) "; read -r use_it
+    [ "$(parse_input $use_it)" = "n" ] && exit 0;
+  fi
+else
+  echo "Creating db at $PGDATA_DIR"
+  init_db
+fi
+
+start_db
