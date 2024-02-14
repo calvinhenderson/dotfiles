@@ -19,7 +19,7 @@ hs.grid.HINTS = {
 
 local function fitWindows()
   for _, window in pairs(hs.window.visibleWindows()) do
-    if window:subrole() == "AXWindow" then
+    if window:subrole() == "AXStandardWindow" then
       hs.grid.snap(window)
     end
   end
