@@ -20,7 +20,7 @@ mason_lspconfig.setup_handlers {
   function(server_name)
     local lsp_options = {
       capabilities = capabilities,
-      on_attach = on_attach,
+      on_attach = require('plugins.mason.on_attach'),
       single_file_support = true,
     }
 

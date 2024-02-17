@@ -17,9 +17,8 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- Buffers
-vim.keymap.set('n', '<leader>q', ':bp|bd #<CR>', { desc = '[Q]uit buffer, keep pane' })
-vim.keymap.set('n', '<leader>Q', ':qa<CR>', { desc = '[Q]uit all open buffers' })
-vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = '[W]rite buffer to disk' })
+vim.keymap.set('n', '<leader>x', ':bp|bd #<CR>', { desc = 'E[x]it buffer, keep pane' })
+vim.keymap.set('n', '<leader>X', ':qa<CR>', { desc = 'E[x]it all open buffers' })
 vim.keymap.set('n', '<C-h>', ':bp<CR>', { desc = 'Switch to previous buffer' })
 vim.keymap.set('n', '<C-l>', ':bn<CR>', { desc = 'Switch to next buffer' })
 
