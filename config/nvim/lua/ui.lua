@@ -1,8 +1,26 @@
 -- Theme toggle
 vim.g.autodark = 0
 vim.o.background = 'dark'
+
+-- Set the colorscheme to gruvbox
 vim.cmd.colorscheme('gruvbox')
 
+-- Update the rainbow-delimiter colors to gruvbox
+local hooks = require('ibl.hooks')
+local highlight = {
+  "GruvboxRed",
+  "GruvboxYellow",
+  "GruvboxBlue",
+  "GruvboxOrange",
+  "GruvboxGreen",
+  "GruvboxPurple",
+  "GruvboxAqua"
+}
+
+require("ibl").setup { scope = { highlight = highlight } }
+vim.g.rainbow_delimiters = { highlight = highlight }
+
+-- Poll the system theme
 local timer = vim.loop.new_timer()
 if timer ~= nil then
   timer:start(0, 2000, vim.schedule_wrap(function()
@@ -11,14 +29,23 @@ if timer ~= nil then
       return
     end
 
-    local dark_mode = true
-    if vim.fn.has('macunix') ~= 0 then
-      local system_theme = vim.fn.system { 'defaults', 'read', '-g', 'AppleInterfaceStyle' }
-      if not string.find(system_theme, "Dark", 0) then
-        dark_mode = false
-      end
+    local system_theme = ''
+
+    if vim.fn.executable('defaults') == 1 then
+      system_theme = vim.fn.system { 'defaults', 'read', '-g', 'AppleInterfaceStyle' }
+    elseif vim.fn.executable('gsettings') == 1 then
+      system_theme = vim.fn.system { 'gsettings', 'get', 'org.gnome.desktop.interface', 'colorscheme' }
     end
-    vim.o.background = dark_mode and 'dark' or 'light'
+
+    -- Check for light specifically so dark is default
+    local background
+    if not string.find(string.lower(system_theme), "dark", 0) then
+      background = 'light'
+    else
+      background = 'dark'
+    end
+
+    vim.o.background = background
   end))
 end
 
