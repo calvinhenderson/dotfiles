@@ -6,7 +6,6 @@ vim.o.background = 'dark'
 vim.cmd.colorscheme('gruvbox')
 
 -- Update the rainbow-delimiter colors to gruvbox
-local hooks = require('ibl.hooks')
 local highlight = {
   "GruvboxRed",
   "GruvboxYellow",

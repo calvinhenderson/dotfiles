@@ -11,22 +11,23 @@ capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 -- Ensure the servers are installed
 local servers = require('plugins.mason.servers')
+
 local mason_lspconfig = require 'mason-lspconfig'
 mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
-}
+  ensure_installed = {},
+  automatic_installation = true,
+  handlers = {
+    function(server_name)
+      local lsp_options = {
+        capabilities = capabilities,
+        on_attach = require('plugins.mason.on_attach'),
+        single_file_support = true,
+      }
 
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    local lsp_options = {
-      capabilities = capabilities,
-      on_attach = require('plugins.mason.on_attach'),
-      single_file_support = true,
-    }
-
-    local server_opts = servers[server_name] or {}
-    require('lspconfig')[server_name].setup(vim.tbl_extend("force", lsp_options, server_opts))
-  end,
+      local server_opts = servers[server_name] or {}
+      require('lspconfig')[server_name].setup(vim.tbl_extend("force", lsp_options, server_opts))
+    end
+  }
 }
 
 -- vim: ts=2 sts=2 sw=2 et

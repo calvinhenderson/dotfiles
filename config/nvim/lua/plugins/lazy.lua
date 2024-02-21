@@ -161,6 +161,14 @@ require('lazy').setup({
 
   -- Floating terminal
   'numToStr/FTerm.nvim',
+
+  -- Elixir tools
+  {
+    'elixir-tools/elixir-tools.nvim',
+    version = '*',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    event = { 'BufReadPre', 'BufNewFile' }
+  }
 }, {})
 
 -- vim: ts=2 sts=2 sw=2 et
