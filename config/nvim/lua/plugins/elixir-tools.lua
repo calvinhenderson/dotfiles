@@ -23,6 +23,11 @@ elixir.setup {
         { buffer = true, noremap = true, desc = "Convert [T]o [P]ipe" })
       vim.keymap.set("v", "<leader>em", ":ElixirExpandMacro<cr>",
         { buffer = true, noremap = true, desc = "[E]xpand [M]acro" })
+
+      vim.keymap.set("n", "<F5>", ":Mix test<CR>",
+        { buffer = true, noremap = true, desc = "Execute test suite" })
+      vim.keymap.set("n", "<F8>", ":Mix deps.get<CR>",
+        { buffer = true, noremap = true, desc = "Sync dependencies" })
     end,
   }
 }
