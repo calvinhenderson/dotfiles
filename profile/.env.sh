@@ -71,7 +71,9 @@ export HEX_HOME="$XDG_DATA_HOME/hex"
 #: }}}
 #: {{{ Go
 
-export GOROOT="$ASDF_DATA_DIR/plugins/golang/set-env.zsh"
+if [ -f "$ASDF_DATA_DIR/plugins/golang/set-env.zsh" ]; then
+  source "$ASDF_DATA_DIR/plugins/golang/set-env.zsh"
+fi
 
 #: }}}
 #: {{{ Node/npm

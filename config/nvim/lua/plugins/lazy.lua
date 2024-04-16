@@ -168,6 +168,13 @@ require('lazy').setup({
     version = '*',
     dependencies = { 'nvim-lua/plenary.nvim' },
     event = { 'BufReadPre', 'BufNewFile' }
+  },
+
+  -- Markdown
+  {
+    'vim-pandoc/vim-pandoc',
+    event = { 'BufReadPre', 'BufNewFile', 'BufFilePre' },
+    dependencies = { 'vim-pandoc/vim-pandoc-syntax' }
   }
 }, {})
 
