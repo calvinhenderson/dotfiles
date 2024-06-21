@@ -9,9 +9,11 @@ init_db() {
   sleep 3
   echo "ALTER ROLE postgres PASSWORD 'postgres';" | psql -U postgres
   kill %1
+  sleep 1
 }
 
 start_db() {
+  echo "Starting database at $PGDATA_DIR"
   postgres -D "$PGDATA_DIR"
 }
 
