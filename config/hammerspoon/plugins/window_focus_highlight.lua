@@ -1,16 +1,18 @@
 -- This module draws a frame around the currently focused window
 local frameFocusCanvas = nil
+local border_width = 2
 
 local function updateFocusFrame(_window, _app_name, _event)
-  frameFocusCanvas:frame(hs.window.frontmostWindow():frame())
+  local window_frame = hs.window.frontmostWindow():frame()
+  frameFocusCanvas:frame(window_frame)
   frameFocusCanvas:show()
 end
 
 local element = {
   type = "rectangle",
   action = "stroke",
-  strokeColor = { red = 1.0, green = 0.6, blue = 0.2 },
-  strokeWidth = 8,
+  strokeColor = { red = 1.0, green = 0.0, blue = 0.0 },
+  strokeWidth = border_width,
   roundedRectRadii = { xRadius = 10.0, yRadius = 10.0 }
 }
 
