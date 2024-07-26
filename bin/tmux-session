@@ -81,7 +81,7 @@ select_project() {
     display_options="$display_options$prefix $option\n"
   done
 
-  display_options=$(echo -e "$display_options" | sed -e 's/\n$//')
+  display_options=$(echo "$display_options" | sed -e 's/\n$//')
 
   if [ $# -eq 1 ]; then
     create_and_attach_session "$1"
