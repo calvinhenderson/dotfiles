@@ -13,18 +13,14 @@ return {
 
   -- Elixir tools
   {
-    'elixir-tools/elixir-tools.nvim',
-    version = '*',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    event = { 'BufReadPre', 'BufNewFile' }
+    "elixir-tools/elixir-tools.nvim",
+    version = "*",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    event = { "BufReadPre", "BufNewFile" }
   },
 
   -- Markdown
-  {
-    'vim-pandoc/vim-pandoc',
-    event = { 'BufReadPre', 'BufNewFile', 'BufFilePre' },
-    dependencies = { 'vim-pandoc/vim-pandoc-syntax' }
-  }
+  "vim-pandoc/vim-pandoc-syntax",
 
   -- == Examples of Overriding Plugins ==
 

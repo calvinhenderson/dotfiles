@@ -5,6 +5,7 @@ if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
 ---@type LazySpec
 return {
   "nvim-treesitter/nvim-treesitter",
+  ---@type vim.treesitter.LanguageTree.new.Opts
   opts = {
     ensure_installed = {
       "c",
