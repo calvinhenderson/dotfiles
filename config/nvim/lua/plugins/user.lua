@@ -22,6 +22,9 @@ return {
   -- Markdown
   "vim-pandoc/vim-pandoc-syntax",
 
+  -- Caddyfile support
+  "isobit/vim-caddyfile",
+
   -- == Examples of Overriding Plugins ==
 
   -- -- customize alpha options
