@@ -1,0 +1,31 @@
+snippet cisc CISC python project template
+    #!/usr/bin/env python3
+    # $1
+    # Calvin Henderson
+    # CISC 120 90
+    
+    import stdio
+    import sys
+    
+    def main():
+        if len(sys.argv) != $2:
+            stdio.writeln("""
+            # Usage
+            
+            $ python {} $3
+            
+            $4 - $5
+            
+            $6
+            
+            # Example
+            
+            $ python {} $7
+            $8
+            """.format(sys.argv[0], sys.argv[0]))
+            sys.exit(1)
+    
+        $9
+    
+    if __name__ == '__main__':
+        main()
