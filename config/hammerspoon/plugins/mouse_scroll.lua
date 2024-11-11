@@ -2,8 +2,8 @@
 
 local scrollButton = 3
 local deferred = false
-local speed_x = 1
-local speed_y = -4
+local speed_x = 0.1
+local speed_y = -0.5
 
 function isScrolling()
   buttons = hs.mouse.getButtons()
@@ -54,7 +54,7 @@ mouseDragEvent = hs.eventtap.new({ hs.eventtap.event.types.otherMouseDragged }, 
     local dx = event:getProperty(hs.eventtap.event.properties['mouseEventDeltaX'])
     local dy = event:getProperty(hs.eventtap.event.properties['mouseEventDeltaY'])
     -- Scroll
-    local scroll = hs.eventtap.event.newScrollEvent({ -dx * speed_x, -dy * speed_y }, {}, "pixel")
+    local scroll = hs.eventtap.event.newScrollEvent({ -dx * speed_x, -dy * speed_y }, {}, "line")
 
     -- Reset the mouse position
     hs.mouse.absolutePosition(mouse_pos)
