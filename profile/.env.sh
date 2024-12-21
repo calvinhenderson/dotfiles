@@ -131,14 +131,18 @@ fi
 #: }}} INSTALL DEPS
 #: {{{ Elixir/Mix
 
-if command -v asdf &>/dev/null && asdf plugin list | grep -O "elixir" >/dev/null; then
-  asdf plugin add elixir https://github.com/asdf-vm/asdf-elixir.git >/dev/null 2>&1
-fi
+if command -v asdf &>/dev/null; then
+  plugins=$(asdf plugin list)
 
-if command -v asdf &>/dev/null && asdf plugin list | grep -O "erlang" >/dev/null; then
-  asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git >/dev/null 2>&1
+  if command -v asdf &>/dev/null && echo "$plugins" | grep -o "elixir" >/dev/null; then
+    asdf plugin add elixir https://github.com/asdf-vm/asdf-elixir.git >/dev/null 2>&1
+  fi
+
+  if command -v asdf &>/dev/null && echo "$plugins" | grep -o "erlang" >/dev/null; then
+    asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git >/dev/null 2>&1
+  fi
+  export HEX_HOME="$XDG_DATA_HOME/hex"
 fi
-export HEX_HOME="$XDG_DATA_HOME/hex"
 
 #: }}}
 #: {{{ Go
@@ -150,7 +154,7 @@ fi
 #: }}}
 #: {{{ Node/npm
 
-if command -v asdf &>/dev/null && asdf plugin list | grep -O "nodejs" >/dev/null; then
+if command -v asdf &>/dev/null && echo "$plugins" | grep -o "nodejs" >/dev/null; then
   asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git >/dev/null 2>&1
 fi
 
