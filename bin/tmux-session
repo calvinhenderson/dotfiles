@@ -56,7 +56,7 @@ select_project() {
   options=$({
       printf "$sessions\n"
       ls -1dt $SEARCH_DIRS 2>/dev/null
-      if [ -n $(echo -e "$sessions" | grep "$(name_session "$DOTFILES_DIR")") ]; then
+      if [ -n $(printf "$sessions" | grep "$(name_session "$DOTFILES_DIR")") ]; then
         echo "Dotfiles"
       fi
       echo "Clone Repository"
@@ -64,7 +64,7 @@ select_project() {
     } | tr '\n' ':' | sed -e 's/^://')
 
   dotfiles_session=$(name_session "$DOTFILES_DIR")
-  echo -e "$sessions" | grep "$dotfiles_session"
+  printf "$sessions" | grep "$dotfiles_session"
 
   # Rice the options list before displaying to the user
   display_options=""
@@ -81,7 +81,7 @@ select_project() {
     display_options="$display_options$prefix $option\n"
   done
 
-  display_options=$(echo -e "$display_options" | sed -e 's/\n$//')
+  display_options=$(printf "$display_options" | sed -e 's/\n$//')
 
   if [ $# -eq 1 ]; then
     create_and_attach_session "$1"

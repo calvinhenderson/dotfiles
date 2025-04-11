@@ -78,6 +78,10 @@ alias hxi="mix hex.info"
 if should_install "brew"; then
   echo "installing homebrew"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+ 
+  echo >> /Users/calvin_henderson/.zprofile
+  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/calvin_henderson/.local.env.sh
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 install_deps=""
