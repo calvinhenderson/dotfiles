@@ -21,7 +21,7 @@
     :calvins-macbook-air "com.google.Chrome.app.mdpkiolbdkhdjpekfbkbmhigcaggjagi"
   })
 (local aichat-bundleid {
-    :calvins-mac-mini    "com.google.Chrome.app.middhkheabcpldedhfajdpknfpcdkecd"
+    :calvins-mac-mini    "com.google.Chrome.app.caidcmannjgahlnbpmidmiecjcoiiigg"
     :calvins-macbook-air "com.google.Chrome.app.gdfaincndogidkdcdkhapmbffkckdkhn"
   })
 ; Misc
