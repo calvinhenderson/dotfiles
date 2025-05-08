@@ -1,33 +1,16 @@
 ; {{{ Configuration
 ; {{{ - Applications
 
+; Configure host-agnostic bundle ids here.
+; Host-specific configuration should go in local.fnl
+(global apps {})
+
 ; Browser
-(local browser-bundleid "com.google.Chrome")
-(local browser-name "Google Chrome")
+(tset _G.apps :browser-bundleid "com.google.Chrome")
+(tset _G.apps :browser-name "Google Chrome")
 ; Terminal
-(local terminal-name "kitty")
-(local terminal-bundleid "net.kovidgoyal.kitty")
-; Google PWA apps
-(local gmail-bundleid    {
-    :calvins-mac-mini "com.google.Chrome.app.fmgjjmmmlfnkbppncabfkddbjimcfncm"
-    :calvins-macbook-air "com.google.Chrome.app.fmgjjmmmlfnkbppncabfkddbjimcfncm"
-  })
-(local calendar-bundleid {
-    :calvins-mac-mini "com.google.Chrome.app.kjbdgfilnfhdoflbpgamdcdgpehopbep"
-    :calvins-macbook-air "com.google.Chrome.app.kjbdgfilnfhdoflbpgamdcdgpehopbep"
-  })
-(local messages-bundleid {
-    :calvins-mac-mini "com.google.Chrome.app.mdpkiolbdkhdjpekfbkbmhigcaggjagi"
-    :calvins-macbook-air "com.google.Chrome.app.mdpkiolbdkhdjpekfbkbmhigcaggjagi"
-  })
-(local aichat-bundleid {
-    :calvins-mac-mini    "com.google.Chrome.app.caidcmannjgahlnbpmidmiecjcoiiigg"
-    :calvins-macbook-air "com.google.Chrome.app.gdfaincndogidkdcdkhapmbffkckdkhn"
-  })
-; Misc
-(local windows-bundleid "com.microsoft.rdc.macos")
-(local music-bundleid "com.google.Chrome.app.pjibgclleladliembfgfagdaldikeohf")
-(local notes-bundleid "md.obsidian")
+(tset _G.apps :terminal-name "kitty")
+(tset _G.apps :terminal-bundleid "net.kovidgoyal.kitty")
 
 ; }}}
 ; {{{ - Commands/Hyperlinks
@@ -88,108 +71,11 @@
 
 ; }}}
 ; {{{ Windows and Layouts
-; {{{ - Monitors
+; {{{ - Default variables
 
-(local monitors {
-    :sceptre_l "Sceptre F24"
-    :acer_32 "EB321HQU"
-    :sceptre_r "F24"
-    :builtin "Built-in Display"
-  })
-
-; }}}
-; {{{ - Layouts
-
-(local layouts {
-  ; https://www.hammerspoon.org/docs/hs.layout.html#apply
-
-  :calvins-macbook-air [ ]
-
-  :calvins-mac-mini [
-    ; left monitor windows
-    { :monitor (. monitors :sceptre_l )
-      :app browser-bundleid
-      :title ".*(Default).*"
-      :frame [ 0.00 0.00 1.00 1.00 ] }
-    ; { :monitor (. monitors :sceptre_l )
-    ;   :app browser-bundleid
-    ;   :title ".*Incident IQ.*"
-    ;   :frame [ 0.00 0.00 1.00 1.00 ] }
-
-    ; main monitor windows
-    { :monitor (. monitors :acer_32 )
-      :app browser-bundleid
-      :title ".*C %(schools%).*"
-      :frame [ 0.55 0.50 0.45 0.50 ] }
-    { :monitor (. monitors :acer_32 )
-      :app browser-bundleid
-      :title ".*C %(students%).*"
-      :frame [ 0.50 0.50 0.45 0.50 ] }
-    { :monitor (. monitors :acer_32 )
-      :app browser-bundleid
-      :title ".*Incident IQ.*"
-      :frame [ 0.00 0.00 0.50 1.00 ] }
-    { :monitor (. monitors :acer_32 )
-      :app windows-bundleid
-      :title ".*"
-      :frame [ 0.50 0.00 0.50 0.50 ] }
-    { :monitor (. monitors :acer_32 )
-      :app terminal-bundleid
-      :title ".*"
-      :frame [ 0.10 0.05 0.80 0.90 ] }
-
-    ; right monitor windows
-    { :monitor (. monitors :sceptre_r )
-      :app calendar-bundleid
-      :title ".*"
-      :frame [ 0.00 0.00 1.00 0.33 ] }
-    { :monitor (. monitors :sceptre_r )
-      :app gmail-bundleid
-      :title ".*"
-      :frame [ 0.00 0.33 1.00 0.34 ] }
-    { :monitor (. monitors :sceptre_r )
-      :app messages-bundleid
-      :title ".*"
-      :frame [ 0.00 0.67 1.00 0.33 ]
-      }
-    { :monitor (. monitors :sceptre_r )
-      :app aichat-bundleid
-      :title ".*"
-      :frame [ 0.00 0.00 1.00 1.00 ] }
-    { :monitor (. monitors :sceptre_r )
-      :app notes-bundleid
-      :title ".*"
-      :frame [ 0.00 0.00 1.00 1.00 ] }
-  ]})
-
-; }}}
-; {{{ - Focus groups
-
-(local focus-groups [
-  [
-    { :app gmail-bundleid    :title ".*" }
-    { :app calendar-bundleid :title ".*" }
-    { :app messages-bundleid :title ".*" }
-  ] [
-    { :app browser-bundleid :title ".*Incident IQ.*" :ignore true }
-    { :app windows-bundleid :title ".*" }
-    { :app browser-bundleid :title ".*C %(SCHools%)$" }
-    { :app browser-bundleid :title ".*C %(STUdents%)$" }
-  ] [
-    { :app terminal-bundleid :title ".*" }
-    { :app aichat-bundleid   :title ".*" }
-  ]])
-
-; }}}
-; {{{ - Focus actions
-
-(local focus-actions [
-  ; {
-  ;   :app browser-bundleid
-  ;   :title ".*"
-  ;   :fn (lambda [window] (system-open (. shortcut-uri :)))
-  ; }
-  ])
+(global layout [])
+(global focus-groups [])
+(global focus-actions [])
 
 ; }}}
 ; {{{ - Window helpers
@@ -226,7 +112,7 @@
         ))))
 
 (fn set-layout [ ]
-  (each [_ params (ipairs (. layouts (hostname)))]
+  (each [_ params (ipairs (. _G.layout))]
     (layout-with-enhanced-interface-off (window-layout params))))
 
 (fn set-window-fraction [app window screen x y w h]
@@ -295,7 +181,7 @@
       (hs.mouse.absolutePosition { :x cx :y cy }))
 
     ; find any matching focus groups
-    (each [_ group (ipairs focus-groups)]
+    (each [_ group (ipairs _G.focus-groups)]
       (each [_ gwin (ipairs group)]
         (if (and (not (. gwin :ignore)) (window-matches window gwin))
           (hs.fnutils.concat matched group))))
@@ -306,7 +192,7 @@
           (gwindow:raise))
         ))
     ; find any matching focus actions
-    (each [_ action (ipairs focus-actions)]
+    (each [_ action (ipairs _G.focus-actions)]
       (if (window-matches window action) ((. action :fn) window)))
     ; we have to activate the application first
     ; otherwise, it won't always focus the correct window.
@@ -467,7 +353,7 @@
   (hs.pasteboard.setContents item.value)
   (clipboard-watcher:start)
   (if (and chooser-focused-window
-        (= windows-bundleid (app:bundleID)))
+        (= _G.apps.windows-bundleid (app:bundleID)))
     (app:activate)
     (hs.eventtap.keyStroke [ "cmd" ] "v"))
   ))
@@ -533,15 +419,15 @@
 ; {{{ Keyboard shortcuts
 ; {{{ - Launchers
 
-(hs.hotkey.bind hyper "b" #(show-app browser-bundleid))
-(hs.hotkey.bind hyper "s" #(show-app terminal-bundleid))
-(hs.hotkey.bind hyper "y" #(show-app music-bundleid focus-previous-window))
-(hs.hotkey.bind hyper "m" #(show-app gmail-bundleid focus-previous-window))
-(hs.hotkey.bind hyper "-" #(show-app calendar-bundleid focus-previous-window))
-(hs.hotkey.bind hyper "c" #(show-app messages-bundleid focus-previous-window))
-(hs.hotkey.bind hyper "w" #(show-app windows-bundleid focus-previous-window))
-(hs.hotkey.bind hyper ";" #(show-app aichat-bundleid focus-previous-window))
-(hs.hotkey.bind hyper "n" #(show-app notes-bundleid focus-previous-window))
+(hs.hotkey.bind hyper "b" #(show-app _G.apps.browser-bundleid))
+(hs.hotkey.bind hyper "s" #(show-app _G.apps.terminal-bundleid))
+(hs.hotkey.bind hyper "y" #(show-app _G.apps.music-bundleid focus-previous-window))
+(hs.hotkey.bind hyper "m" #(show-app _G.apps.gmail-bundleid focus-previous-window))
+(hs.hotkey.bind hyper "-" #(show-app _G.apps.calendar-bundleid focus-previous-window))
+(hs.hotkey.bind hyper "c" #(show-app _G.apps.messages-bundleid focus-previous-window))
+(hs.hotkey.bind hyper "w" #(show-app _G.apps.windows-bundleid focus-previous-window))
+(hs.hotkey.bind hyper ";" #(show-app _G.apps.aichat-bundleid focus-previous-window))
+(hs.hotkey.bind hyper "n" #(show-app _G.apps.notes-bundleid focus-previous-window))
 (hs.hotkey.bind hyper "Space" #(show-window-fuzzy)) ; all windows
 (hs.hotkey.bind hyper "." #(show-window-fuzzy true)) ; app windows
 (hs.hotkey.bind hyper "a" #(show-audio-fuzzy))
@@ -575,9 +461,11 @@
 
 ; }}}
 ; }}}
-; {{{ Exports
+; {{{ Imports / Exports
 
-(tset _G :taskMenu (hs.menubar.new))
-(tset _G :focusPreviousWindow focus-previous-window)
+(require :local)
+
+(global taskMenu (hs.menubar.new))
+(global focusPreviousWindow focus-previous-window)
 
 ; }}}
