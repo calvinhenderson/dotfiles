@@ -343,7 +343,7 @@
 
 ; track clipboard history
 (local clipboard-menu (hs.menubar.new))
-(local clipboard-history [])
+(var clipboard-history [])
 (var clipboard-watcher nil)
 
 (fn paste-clipboard-item [item]
@@ -367,8 +367,9 @@
 (fn insert-clipboard-item [text]
   "Inserts an text in the clipboard history"
   (when text
+    (doto clipboard-watcher
+      (: :stop))
     (var text text)
-    (local pasteboard (require :hs.pasteboard))
     (local pattern "(%d+)/(%d+)/(%d+)")
     (if (string.find text (.. "^" pattern "$"))
       ; format copied dates from 01/01/25 to 01/01/2025
@@ -376,17 +377,18 @@
         (if (= (length year) 2)
           (year (.. "20" year)))
         (set text (string.format "%02d/%02d/%d" month day year)))
-      (doto pasteboard
-        (: :setContents text)))
+      (hs.pasteboard.setContents text))
     (while (>= (length clipboard-history) clipboard-max-entries)
-      (table.remove clipboard-history 1))
+      (table.remove clipboard-history))
     (local label-length 25)
     (var label text)
     (if (> (length text) label-length)
         (set label (.. (text:gsub 0 label-length) "...")))
     (set label (label:gsub "\n" ""))
     (table.insert clipboard-history 1 { :label label :value text })
-    (update-clipboard-title)))
+    (update-clipboard-title))
+    (doto clipboard-watcher
+      (: :start)))
 
 (fn clipboard-contents-updated [item]
   (insert-clipboard-item item)
@@ -401,11 +403,19 @@
       (: :start))
     ))
 
+(fn clipboard-reset []
+  ; clear the current entry in the clipboard
+  (insert-clipboard-item "")
+  ; delete all existing entries
+  (update-clipboard-title))
+
 (set clipboard-watcher (hs.pasteboard.watcher.new on-clipboard-updated))
 
 (when clipboard-menu
   (doto clipboard-menu
     (: :setTooltip "Clipboard History"))
+  (doto clipboard-menu
+    (: :setClickCallback clipboard-reset))
   (update-clipboard-title))
 
 (fn show-clipboard-fuzzy []
