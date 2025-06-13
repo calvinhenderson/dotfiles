@@ -9,8 +9,8 @@
 (tset _G.apps :browser-bundleid "com.google.Chrome")
 (tset _G.apps :browser-name "Google Chrome")
 ; Terminal
-(tset _G.apps :terminal-name "kitty")
-(tset _G.apps :terminal-bundleid "net.kovidgoyal.kitty")
+(tset _G.apps :terminal-name "Alacritty")
+(tset _G.apps :terminal-bundleid "org.alacritty")
 
 ; }}}
 ; {{{ - Commands/Hyperlinks
@@ -61,14 +61,6 @@
 (fn system-open [path] (os.execute (.. "source ~/.profile && "
                                        "open " (shell-escape path))))
 
-(fn get-host-bundle-id [bundleid_s]
-  "If the bundleid is a table, get the one for the specified host.
-  Otherwise, return the string."
-  (if (= "table" (type bundleid_s))
-    (. bundleid_s (hostname))
-    bundleid_s
-  ))
-
 ; }}}
 ; {{{ Windows and Layouts
 ; {{{ - Default variables
@@ -92,8 +84,9 @@
   (if (= (. tbl key) nil) default (. tbl key)))
 
 (fn window-layout [params]
+  (print (hs.inspect params))
   (let [
-    layout-app (get-host-bundle-id (. params :app))
+    layout-app (. params :app)
     bundleid   (hs.application.get layout-app)
     title      (. params :title)
     screen     (. params :monitor)
@@ -145,11 +138,10 @@
 (fn app-matches [app gapp]
   (when app
     (let [app-bundle  (app:bundleID)
-          host-bundle (get-host-bundle-id gapp)
           app-name    (app:name)]
       (or
-        (fuzzy-window-title app-bundle host-bundle)
-        (fuzzy-window-title app-name host-bundle)
+        (fuzzy-window-title app-bundle gapp)
+        (fuzzy-window-title app-name gapp)
       ))))
 
 (fn window-matches [window gwin]
@@ -256,8 +248,7 @@
 
 (fn focus-last-window [bundleid]
   "Focuses the previously active window."
-  (let [app      (get-host-bundle-id bundleid)
-        app      (hs.application.get app)
+  (let [app      (hs.application.get bundleid)
         windows  (hs.window.orderedWindows)]
     (when app
       (each [_ window (ipairs windows)]
@@ -271,17 +262,25 @@
 
 (fn focus-or-launch [bundleid]
   "Will try to focus a window or launch the application if no windows exist."
-  (let [app (get-host-bundle-id bundleid)
-        did-focus  (focus-last-window app)
-        did-launch (hs.application.launchOrFocusByBundleID app)]
+  (let [did-focus  (focus-last-window bundleid)
+        did-launch (hs.application.launchOrFocusByBundleID bundleid)]
     (or did-focus did-launch)))
+
+(fn show-app-window [bundleid title]
+  "Activate app window with bundleid and title."
+
+  (let [focused-app (hs.application.frontmostApplication)
+        is-focused  (= bundleid (focused-app:bundleID))]
+    (when (not is-focused)
+      (focus-or-launch bundleid))
+    (each [_ window (ipairs (hs.window.orderedWindows))]
+      (when (window-matches window {:app bundleid :title title})
+        (window:focus)))))
 
 (fn show-app [bundleid func]
   "Activate app with bundleid.
 
   If already active, call (func or show-window-fuzzy)(app)"
-  ; first make sure we have the correct bundle id
-  (local bundleid (get-host-bundle-id bundleid))
 
   (let [focused-app (hs.application.frontmostApplication)]
     (if (not= bundleid (focused-app:bundleID))
@@ -429,7 +428,8 @@
 ; {{{ Keyboard shortcuts
 ; {{{ - Launchers
 
-(hs.hotkey.bind hyper "b" #(show-app _G.apps.browser-bundleid))
+(hs.hotkey.bind hyper "b" #(show-app-window _G.apps.browser-bundleid ".*%(Default%).*"))
+(hs.hotkey.bind hyper "j" #(show-app-window _G.apps.browser-bundleid ".*%(sCHools%).*"))
 (hs.hotkey.bind hyper "s" #(show-app _G.apps.terminal-bundleid))
 (hs.hotkey.bind hyper "y" #(show-app _G.apps.music-bundleid focus-previous-window))
 (hs.hotkey.bind hyper "m" #(show-app _G.apps.gmail-bundleid focus-previous-window))
