@@ -1,0 +1,35 @@
+# {{{ General
+
+[general]
+import = [
+  "~/.config/alacritty/local.toml",
+  "~/.config/alacritty/themes/gruvbox_dark.toml",
+]
+
+# Enable config live reload
+live_config_reload = true
+
+# Enable the IPC socket for use with `alacritty msg`
+ipc_socket = true
+
+# }}}
+# {{{ Window settings
+
+[window]
+dimensions = { columns = 80, lines = 28 }
+
+# Window appearance
+dynamic_padding = true
+decorations = "Full"
+dynamic_title = true
+
+# }}}
+# {{{ Font
+
+[font]
+normal = { family = "GeistMono Nerd Font Mono" }
+
+size = 18.0
+builtin_box_drawing = false
+
+# }}}

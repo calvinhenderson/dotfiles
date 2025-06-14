@@ -346,7 +346,7 @@
 (var clipboard-watcher nil)
 
 (fn paste-clipboard-item [item]
-  (when clipboard-watcher
+  (when (and clipboard-watcher item)
   (local app (chooser-focused-window:application))
   (clipboard-watcher:stop)
   (hs.pasteboard.setContents item.value)
@@ -428,8 +428,12 @@
 ; {{{ Keyboard shortcuts
 ; {{{ - Launchers
 
-(hs.hotkey.bind hyper "b" #(show-app-window _G.apps.browser-bundleid ".*%(Default%).*"))
-(hs.hotkey.bind hyper "j" #(show-app-window _G.apps.browser-bundleid ".*%(sCHools%).*"))
+(hs.hotkey.bind hyper "b" (_G.leader {
+  [hyper "b"] #(show-app-window _G.apps.browser-bundleid ".*%(Default%).*")
+  [hyper "s"] #(show-app-window _G.apps.browser-bundleid ".*%(sCHools%).*")
+  [hyper "t"] #(show-app-window _G.apps.browser-bundleid ".*%(sTUdents%).*")
+  }))
+
 (hs.hotkey.bind hyper "s" #(show-app _G.apps.terminal-bundleid))
 (hs.hotkey.bind hyper "y" #(show-app _G.apps.music-bundleid focus-previous-window))
 (hs.hotkey.bind hyper "m" #(show-app _G.apps.gmail-bundleid focus-previous-window))

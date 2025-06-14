@@ -30,6 +30,7 @@ hs.ipc.cliInstall(path)
 hs.ipc.cliSaveHistory(true)
 
 mouseScroll = require("plugins.mouse_scroll")
+leader = require("plugins.leader_key")
 
 fennel = require("fennel")
 table.insert(package.loaders or package.searchers, fennel.searcher)

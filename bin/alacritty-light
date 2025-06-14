@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+alacritty msg config "$(cat ~/.config/alacritty/themes/gruvbox_light.toml)"
