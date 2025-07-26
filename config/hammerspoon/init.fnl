@@ -455,6 +455,8 @@
 ; }}}
 ; {{{ - Window management
 
+(local mouse-grid (require :plugins.mouse_grid))
+
 (hs.hotkey.bind hyper "l" #(set-layout))
 (hs.hotkey.bind hyper "g" #(move-active-window-to-next-screen))
 (hs.hotkey.bind hyper "1" #(move-active-window nil 0    0    0.5  1))   ; first half
@@ -471,6 +473,7 @@
 (hs.hotkey.bind hyper "[" #(window-switcher:previous)) ; previous application window (chooser)
 (hs.hotkey.bind hyper "]" #(window-switcher:next))     ; next application window (chooser)
 (hs.hotkey.bind hyper "h" #(hide-focused-window))      ; minimize the current window
+(hs.hotkey.bind hyper "Return" #(mouse-grid.start-mouse-grid))
 (set-layout)
 
 ; }}}
