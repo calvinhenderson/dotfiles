@@ -425,6 +425,24 @@
 
 ; }}}
 ; }}}
+; {{{ Networking
+
+; _G.ssid-location-mappings is a table containing SSID -> Location mappings
+(fn ssid-changed [_watcher _event interface]
+  (if (~= interface "en0") (lua "return"))
+  (let [ssid (hs.wifi.currentNetwork interface)
+        mappings (or _G.ssid-location-mappings {})
+        location (. mappings ssid)
+        location (or (and (= nil location) "Automatic") location)
+        config (hs.network.configuration.open)]
+    (if (= ssid nil) (lua "return"))
+    (print "Switching to network location:" location)
+    (config:setLocation location)))
+
+(tset _G :wifi-watcher (hs.wifi.watcher.new ssid-changed))
+(_G.wifi-watcher:start)
+
+; }}}
 ; {{{ Keyboard shortcuts
 ; {{{ - Launchers
 
