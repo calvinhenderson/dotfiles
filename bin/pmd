@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+set -euo pipefail
+
+TMPFILE="$(mktemp).pdf"
+echo "$TMPFILE"
+pandoc "$1" -o "$TMPFILE"
+cat "$TMPFILE" | open -f -a Preview

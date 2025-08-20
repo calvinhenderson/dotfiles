@@ -1,0 +1,39 @@
+#!/usr/bin/env sh
+
+WORD_LIST=/usr/share/dict/words
+WORD_LIST=~/Documents/safe_word_list.txt
+WORD_COUNT=3
+
+get_word() {
+	cat $WORD_LIST |
+		grep -E '\b[a-zA-Z]{2,4}\b' |
+		sort -R |
+		head -n1 |
+		tr '[:upper:]' '[:lower:]'
+}
+
+rand() {
+	seq $1 $2 | sort -R | head -n1
+}
+
+RAND_NUM_IDX=$(rand 1 $WORD_COUNT)
+RAND_NUM=$(rand 0 9)
+RAND_CAP_IDX=$(rand 1 $WORD_COUNT)
+
+for i in $(seq 1 $WORD_COUNT); do
+	if [ $i -eq $RAND_CAP_IDX ]; then
+		word=$(get_word | perl -pe 's/(\b[a-z])/\L\E\U\1/g')
+	else
+		word=$(get_word)
+	fi
+
+	if [ $i -eq $RAND_NUM_IDX ]; then
+		printf '%d%s' $RAND_NUM $word
+	else
+		printf '%s' $word
+	fi
+
+	if [ $i -lt $WORD_COUNT ]; then
+		printf '-'
+	fi
+done
