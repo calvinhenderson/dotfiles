@@ -428,7 +428,7 @@
 ; {{{ Networking
 
 ; _G.ssid-location-mappings is a table containing SSID -> Location mappings
-(fn ssid-changed [_watcher _event interface]
+(fn ssid-changed [_watcher event interface]
   (if (~= interface "en0") (lua "return"))
   (let [ssid (hs.wifi.currentNetwork interface)
         mappings (or _G.ssid-location-mappings {})
@@ -436,7 +436,11 @@
         location (or (and (= nil location) "Automatic") location)
         config (hs.network.configuration.open)]
     (if (= ssid nil) (lua "return"))
-    (print "Switching to network location:" location)
+    (print (..
+            "[" (tostring event) "]"
+            "[" (tostring interface) "]: "
+            "Switching to location " (tostring location)
+            " for network " (tostring ssid)))
     (config:setLocation location)))
 
 (tset _G :wifi-watcher (hs.wifi.watcher.new ssid-changed))
@@ -502,5 +506,8 @@
 
 (global taskMenu (hs.menubar.new))
 (global focusPreviousWindow focus-previous-window)
+
+; This has to run after the local overrides are imported.
+(ssid-changed _G.wifi-watcher "SSIDChange" "en0")
 
 ; }}}
