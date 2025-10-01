@@ -2,7 +2,9 @@
 
 set -euo pipefail
 
-TMPFILE="$(mktemp).pdf"
+EXT="${2:-pdf}"
+
+TMPFILE="$(mktemp).$EXT"
 echo "$TMPFILE"
 pandoc "$1" -o "$TMPFILE"
 cat "$TMPFILE" | open -f -a Preview

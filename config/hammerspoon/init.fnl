@@ -61,6 +61,11 @@
 (fn system-open [path] (os.execute (.. "source ~/.profile && "
                                        "open " (shell-escape path))))
 
+; runs a system command
+(fn system-run [cmd]
+  (os.execute (.. "source ~/.profile && " cmd))
+  (hs.alert "Executed command"))
+
 ; }}}
 ; {{{ Windows and Layouts
 ; {{{ - Default variables
@@ -455,7 +460,6 @@
   [hyper "s"] #(show-app-window _G.apps.browser-bundleid ".*%(sCHools%).*")
   [hyper "t"] #(show-app-window _G.apps.browser-bundleid ".*%(sTUdents%).*")
   }))
-
 (hs.hotkey.bind hyper "s" #(show-app _G.apps.terminal-bundleid))
 (hs.hotkey.bind hyper "y" #(show-app _G.apps.music-bundleid focus-previous-window))
 (hs.hotkey.bind hyper "m" #(show-app _G.apps.gmail-bundleid focus-previous-window))
@@ -471,9 +475,11 @@
 (hs.hotkey.bind hyper "h" #(system-open "~/"))
 (hs.hotkey.bind hyper "d" #(system-open "~/Downloads"))
 (hs.hotkey.bind hyper "t" #(system-open (. shortcut-uri :dashboard)))
-(hs.hotkey.bind hyper "p" #(system-open (. shortcut-uri :passwords)))
+(hs.hotkey.bind hyper "p" (_G.leader {
+  [hyper "p"] #(system-run "gen-pw | pbcopy")
+  [hyper "w"] #(system-open (. shortcut-uri :passwords))
+  }))
 (hs.hotkey.bind hyper "q" #(system-open (. shortcut-uri :obsidian-tasks)))
-
 ; }}}
 ; {{{ - Window management
 
@@ -485,9 +491,9 @@
 (hs.hotkey.bind hyper "2" #(move-active-window nil 0.5  0    0.5  1))   ; second half
 (hs.hotkey.bind hyper "3" #(move-active-window nil 0    0    0.33 1))   ; first third
 (hs.hotkey.bind hyper "4" #(move-active-window nil 0.33 0    0.33 1))   ; second third
-(hs.hotkey.bind hyper "5" #(move-active-window nil 0.66 0    0.33 1))   ; third third
+(hs.hotkey.bind hyper "5" #(move-active-window nil 0.66 0    0.34 1))   ; third third
 (hs.hotkey.bind hyper "6" #(move-active-window nil 0    0    0.66 1))   ; two-thirds, left
-(hs.hotkey.bind hyper "7" #(move-active-window nil 0.33 0    0.66 1))   ; two-thirds, right
+(hs.hotkey.bind hyper "7" #(move-active-window nil 0.33 0    0.67 1))   ; two-thirds, right
 (hs.hotkey.bind hyper "8" #(move-active-window nil 0.17 0    0.66 1))   ; two-thirds, center
 (hs.hotkey.bind hyper "9" #(move-active-window nil 0    0    1    1))   ; full screen
 (hs.hotkey.bind hyper "=" #(move-active-window nil 0.1  0.05 0.8  0.9)) ; big picture
