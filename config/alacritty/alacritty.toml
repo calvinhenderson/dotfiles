@@ -2,8 +2,8 @@
 
 [general]
 import = [
-  "~/.config/alacritty/local.toml",
-  "~/.config/alacritty/themes/gruvbox_dark.toml",
+  "local.toml",
+  "selected-theme.toml"
 ]
 
 # Enable config live reload

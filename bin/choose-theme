@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+
+ALACRITTY_HOME="$XDG_CONFIG_HOME/alacritty"
+
+function choose() {
+  cd "$ALACRITTY_HOME/themes"
+
+  ls *.toml \
+  | sed 's/\.toml$//' \
+  | fzf
+}
+
+function change_theme() {
+  cd "$ALACRITTY_HOME"
+
+  # Get the theme choice
+  choice="$ALACRITTY_HOME/themes/$(choose).toml"
+  selected="$ALACRITTY_HOME/selected-theme.toml"
+
+  # Update the selected theme
+  rm -f "$selected" && ln -s "$choice" "$selected"
+
+  # Trigger config reload
+  touch "$ALACRITTY_HOME/alacritty.toml"
+}
+
+change_theme
