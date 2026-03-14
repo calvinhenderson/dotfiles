@@ -1,37 +1,84 @@
--- Auto-load the plugins directory
--- local plugin_dir = require("config").config_root .. "/plugins"
--- for file in hs.fs.dir(plugin_dir) do
---   if file:sub(-4) == ".lua" then
---     print("Loading plugin " .. file)
---     require("plugins." .. file:sub(0, -5))
---   end
--- end
+-- {{{ Init
 
-hs.alert.show("Hammerspoon config loaded")
+require("hs.ipc")
 
-config_root = os.getenv("HOME") .. "/.config/hammerspoon/"
-hyper = { "cmd", "ctrl", "alt" }
+-- Disable window animation
+hs.window.animationDuration = 0
 
--- bind reload at start in case of error later in config
-hs.hotkey.bind(hyper, "r", hs.reload)
-hs.hotkey.bind(hyper, "/", hs.toggleConsole)
+-- }}}
+-- {{{ SpoonInstall
 
--- uncomment this to generate lua definitions
--- hs.loadSpoon("EmmyLua")
+assert(
+	hs.loadSpoon("SpoonInstall"),
+	"missing spoon: SpoonInstall (https://github.com/Hammerspoon/Spoons/raw/refs/heads/master/Spoons/SpoonInstall.spoon.zip)"
+)
 
-function inspect(value)
-  print(hs.inspect(value))
+-- {{{ Repos
+
+spoon.SpoonInstall.repos.PaperWM = {
+	url = "https://github.com/mogenson/PaperWM.spoon",
+	desc = "PaperWM.spoon repository",
+	branch = "release",
+}
+
+spoon.SpoonInstall:updateAllRepos()
+
+-- }}}
+-- {{{ EmmyLua
+
+if not hs.loadSpoon("EmmyLua") then
+	spoon.SpoonInstall:installSpoonFromZipURL(
+		"https://github.com/Hammerspoon/Spoons/raw/refs/heads/master/Spoons/EmmyLua.spoon.zip"
+	)
+	assert(hs.loadSpoon("EmmyLua"), "failed to load EmmyLua")
 end
 
--- install cli
-arch = io.popen('uname -p', 'r'):read('*l')
-path = arch == 'arm' and '/opt/homebrew' or nil
-hs.ipc.cliInstall(path)
-hs.ipc.cliSaveHistory(true)
+-- }}}
+-- {{{ PaperWM
 
-mouseScroll = require("plugins.mouse_scroll")
-leader = require("plugins.leader_key")
+if not hs.loadSpoon("PaperWM") then
+	spoon.SpoonInstall:installSpoonFromRepo("PaperWM", "PaperWM")
+	assert(hs.loadSpoon("PaperWM"), "failed to load PaperWM")
+end
 
-fennel = require("fennel")
-table.insert(package.loaders or package.searchers, fennel.searcher)
-fennel.dofile(config_root .. "init.fnl") -- exports into global namespace
+-- }}}
+-- {{{ Personal Spoons
+
+local PERSONAL_SPOONS = {
+	{ name = "Vi" },
+	{ name = "ScrollButton" },
+	{ name = "Application" },
+	{ name = "System" },
+}
+
+for _, v in ipairs(PERSONAL_SPOONS) do
+	if not v.disabled or not v.name then
+		if not hs.loadSpoon(v.name) then
+			local url = ("https://github.com/calvinhenderson/hammerspoon/releases/download/%s/%s.spoon.zip"):format(
+				v.release or "latest",
+				v.name
+			)
+			spoon.SpoonInstall:installSpoonFromZipURL(url)
+			hs.loadSpoon(v.name)
+			assert(spoon[v.name], ("failed to install spoon %s (%s"):format(v.name, url))
+		end
+	end
+end
+
+-- }}}
+-- {{ Load configuration
+
+require("config")
+
+-- }}}
+-- {{{ Apply local overrides
+
+local _, err = pcall(function()
+	require("local-config")
+end)
+if err and not err:find("module '.*' not found") then
+	print("Error loading local config: " .. err)
+end
+
+-- }}}
+-- vim:set foldmethod=marker
