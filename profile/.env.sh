@@ -146,6 +146,11 @@ if command -v asdf &>/dev/null; then
     asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git >/dev/null 2>&1
   fi
   export HEX_HOME="$XDG_DATA_HOME/hex"
+  export PATH="$ASDF_DATA_DIR/shims:$PATH"
+  mkdir -p "$ASDF_DATA_DIR/completions"
+  asdf completion zsh > "$ASDF_DATA_DIR/completions/_asdf"
+  fpath=("$ASDF_DATA_DIR/completions" $fpath)
+  autoload -Uz compinit && compinit
 fi
 
 #: }}}
