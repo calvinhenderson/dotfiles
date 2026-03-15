@@ -1,39 +1,143 @@
 #!/usr/bin/env sh
 
-WORD_LIST=/usr/share/dict/words
-WORD_LIST=~/Documents/safe_word_list.txt
-WORD_COUNT=3
+# WORD_LIST=/usr/share/dict/words
+# WORD_LIST=~/Documents/safe_word_list.txt
+WORD_COUNT=${WORD_COUNT:-3}
+MIN_LENGTH=${MIN_LENGTH:-2}
+MAX_LENGTH=${MAX_LENGTH:-4}
+WORD_LIST="""
+Actor
+Apple
+April
+Army
+Baby
+Baker
+Bank
+Bird
+Black
+Box
+Cake
+Card
+Cat
+Club
+Corn
+Dark
+Date
+Desk
+Dog
+Door
+Eagle
+East
+Echo
+Egg
+Exit
+Farm
+Fish
+Flag
+Food
+Fox
+Garden
+Gate
+Gold
+Good
+Green
+Hand
+Hat
+Hill
+Home
+Ice
+Idea
+Ink
+Iron
+Jazz
+Job
+Joke
+Jump
+Key
+King
+Kite
+Lake
+Lamp
+Lemon
+Lion
+Map
+Milk
+Moon
+Music
+Name
+Nest
+Night
+Nine
+Oak
+Ocean
+Oil
+Open
+Page
+Paper
+Park
+Pen
+Queen
+Quest
+Quick
+Radio
+Rain
+Red
+Road
+Rock
+Salt
+Ship
+Sky
+Snow
+Star
+Table
+Taxi
+Tent
+Time
+Unit
+Up
+User
+Valley
+View
+Voice
+Wall
+Water
+Wind
+Work
+X-ray
+Yard
+Year
+Yellow
+Zebra
+Zero
+Zone
+Zoo
+"""
 
 get_word() {
-	cat $WORD_LIST |
-		grep -E '\b[a-zA-Z]{2,4}\b' |
-		sort -R |
-		head -n1 |
-		tr '[:upper:]' '[:lower:]'
+  echo "$WORD_LIST" |
+    sort -R |
+    head -n1
 }
 
 rand() {
-	seq $1 $2 | sort -R | head -n1
+  seq $1 $2 | sort -R | head -n1
 }
 
-RAND_NUM_IDX=$(rand 1 $WORD_COUNT)
+RAND_NUM_IDX=1
+# RAND_NUM_IDX=$(rand 1 $WORD_COUNT)
 RAND_NUM=$(rand 0 9)
-RAND_CAP_IDX=$(rand 1 $WORD_COUNT)
+# RAND_CAP_IDX=$(rand 1 $WORD_COUNT)
 
 for i in $(seq 1 $WORD_COUNT); do
-	if [ $i -eq $RAND_CAP_IDX ]; then
-		word=$(get_word | perl -pe 's/(\b[a-z])/\L\E\U\1/g')
-	else
-		word=$(get_word)
-	fi
+  if [ $i -eq $RAND_NUM_IDX ]; then
+    PASSWORD="$PASSWORD$(printf '%d%s' $RAND_NUM $(get_word))"
+  else
+    PASSWORD="$PASSWORD$(printf '%s' $(get_word))"
+  fi
 
-	if [ $i -eq $RAND_NUM_IDX ]; then
-		printf '%d%s' $RAND_NUM $word
-	else
-		printf '%s' $word
-	fi
-
-	if [ $i -lt $WORD_COUNT ]; then
-		printf '-'
-	fi
+  if [ $i -lt $WORD_COUNT ]; then
+    PASSWORD="$PASSWORD-"
+  fi
 done
+
+printf "$PASSWORD"
