@@ -4,8 +4,28 @@ local ScrollButton = spoon.ScrollButton
 local Application = spoon.Application
 local Apps = spoon.Application.Apps
 local System = spoon.System
+local CommandPalette = require("command_palette")
 local PaperWM = spoon.PaperWM
 local paper = spoon.PaperWM.actions.actions()
+
+-- }}}
+-- {{{ Setup
+
+ScrollButton:setup({ button = 1, scroll_direction = 1, unit = "pixel", x_scale = -2, y_scale = 3 })
+
+PaperWM.window_ratios = {
+	0.20,
+	0.30,
+	0.40,
+	0.50,
+	0.60,
+	0.70,
+	0.80,
+	1.00,
+}
+PaperWM.window_gap = 0
+
+hs.application.enableSpotlightForNameSearches(true)
 
 -- }}}
 -- {{{ Helpers
@@ -38,7 +58,7 @@ Vi:mergeConfig({
 Vi:mergeBindings({
 	-- {{{ Modes
 
-	{ "i", H("Esc"), _(Vi.enterMode, Vi, "n"), { leave = false, name = "Leave insert mode" } },
+	{ "i", H("Esc"), _(Vi.enterMode, Vi, "n"), { leave = false, name = "Enter normal mode" } },
 
 	-- }}}
 	-- {{{ Hammerspoon
@@ -56,11 +76,24 @@ Vi:mergeBindings({
 	{ "i", H("5"), _(System.focusSpace, 5), { name = "Goto Space 5" } },
 
 	-- }}}
+	-- {{{ Choosers
+
+	-- Insert mode
+	{ "i", H("Space"), _(CommandPalette.show, CommandPalette), { name = "Command palette" } },
+	{ "i", H("."), _(System.window_chooser, "space"), { name = "Choose window (active space)" } },
+	{ "i", H("`"), _(System.window_chooser, "app"), { name = "Choose window (current application)" } },
+
+	-- }}}
 	-- {{{ Goto
 
 	-- Labels
 	{ "n", "g", nil, { name = "Go" } },
 
+	-- {{{ Password Manager
+
+	{ "n", "gp", focus("com.bitwarden.Desktop"), { name = "Password Manager" } },
+
+	-- }}}
 	-- {{{ Google Chrome
 
 	-- Labels
@@ -93,7 +126,7 @@ Vi:mergeBindings({
 	-- }}}
 	-- {{{ Gemini
 
-	{ "n", "gg", focus("Chat"), { name = "Gemini" } },
+	{ "n", "gg", focus("Google Gemini"), { name = "Gemini" } },
 
 	-- }}}
 	-- }}}
@@ -162,6 +195,14 @@ Vi:mergeBindings({
 	{ "i", "<D-C-A-w><Space>", _(paper.toggle_floating), { name = "Toggle floating" } },
 	{ "i", "<D-C-A-w>f", _(paper.focus_floating), { name = "Focus floating" } },
 
+	-- Alignment
+	{ "i", "<D-C-A-w>H", _(System.align_window, { x = "left" }), { name = "Move to left" } },
+	{ "i", "<D-C-A-w>s", _(System.align_window, { x = "center" }), { name = "Center horizontally" } },
+	{ "i", "<D-C-A-w>L", _(System.align_window, { x = "right" }), { name = "Move to right" } },
+	{ "i", "<D-C-A-w>K", _(System.align_window, { y = "top" }), { name = "Move to top" } },
+	{ "i", "<D-C-A-w>v", _(System.align_window, { y = "center" }), { name = "Center vertically" } },
+	{ "i", "<D-C-A-w>J", _(System.align_window, { y = "bottom" }), { name = "Move to bottom" } },
+
 	-- Columns
 	{ "i", "<D-C-A-w>i", _(paper.slurp_in), { name = "Slurp in" } },
 	{ "i", "<D-C-A-w>o", _(paper.barf_out), { name = "Barf out" } },
@@ -170,16 +211,11 @@ Vi:mergeBindings({
 })
 
 -- }}}
--- {{{ Spoons
-
-ScrollButton:setup({ button = 1, scroll_direction = 1, unit = "pixel", x_scale = -2, y_scale = 3 })
-
-PaperWM.window_ratios = { 1 / 5, 1 / 4, 1 / 3, 1 / 2, 3 / 5, 3 / 4, 2 / 3, 1 }
-PaperWM.window_gap = 0
+-- {{{ Start Spoons
 
 Vi:start()
 ScrollButton:start()
 PaperWM:start()
 
 -- }}}
--- vim:set foldmethod=marker
+-- vim:foldmethod=marker

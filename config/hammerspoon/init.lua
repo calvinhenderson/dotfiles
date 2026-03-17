@@ -21,12 +21,11 @@ spoon.SpoonInstall.repos.PaperWM = {
 	branch = "release",
 }
 
-spoon.SpoonInstall:updateAllRepos()
-
 -- }}}
 -- {{{ EmmyLua
 
 if not hs.loadSpoon("EmmyLua") then
+	spoon.SpoonInstall:updateRepo()
 	spoon.SpoonInstall:installSpoonFromZipURL(
 		"https://github.com/Hammerspoon/Spoons/raw/refs/heads/master/Spoons/EmmyLua.spoon.zip"
 	)
@@ -37,6 +36,7 @@ end
 -- {{{ PaperWM
 
 if not hs.loadSpoon("PaperWM") then
+	spoon.SpoonInstall:updateRepo()
 	spoon.SpoonInstall:installSpoonFromRepo("PaperWM", "PaperWM")
 	assert(hs.loadSpoon("PaperWM"), "failed to load PaperWM")
 end
@@ -49,11 +49,13 @@ local PERSONAL_SPOONS = {
 	{ name = "ScrollButton" },
 	{ name = "Application" },
 	{ name = "System" },
+	{ name = "CommandPalette" },
 }
 
 for _, v in ipairs(PERSONAL_SPOONS) do
 	if not v.disabled or not v.name then
 		if not hs.loadSpoon(v.name) then
+			print("Installing spoon ", v.name)
 			local url = ("https://github.com/calvinhenderson/hammerspoon/releases/download/%s/%s.spoon.zip"):format(
 				v.release or "latest",
 				v.name
@@ -81,4 +83,4 @@ if err and not err:find("module '.*' not found") then
 end
 
 -- }}}
--- vim:set foldmethod=marker
+-- vim:foldmethod=marker
