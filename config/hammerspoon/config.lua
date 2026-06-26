@@ -4,7 +4,6 @@ local ScrollButton = spoon.ScrollButton
 local Application = spoon.Application
 local Apps = spoon.Application.Apps
 local System = spoon.System
-local CommandPalette = require("command_palette")
 local PaperWM = spoon.PaperWM
 local paper = spoon.PaperWM.actions.actions()
 
@@ -44,6 +43,110 @@ local function focus(matchtexts, launcher)
 	return _(Application.focus_or_launch, matchtexts, launcher)
 end
 
+local expose = hs.expose.new(nil, {
+	textSize = 60,
+	backgroundColor = { 0.03, 0.03, 0.03, 0.5 },
+	thumbnailAlpha = 0.5,
+	closeModeModifier = "cmd",
+	closeModeBackgroundColor = { 0.8, 0.1, 0.1, 0.5 },
+	minimizeModeModifier = "shift",
+	minimizeModeBackgroundColor = { 0.1, 0.3, 0.8, 0.5 },
+	onlyActiveApplication = false,
+	includeOtherSpaces = true,
+	includeNonVisible = false,
+	otherSpacesStripPosition = "top",
+	otherSpacesStripWidth = 0,
+	nonVisibleStripWidth = 0,
+	maxHintLetters = 1,
+	showThumbnails = true,
+	fitWindowsMaxIterations = 10,
+})
+
+local function prompt_input(prompt, details)
+	local btn, val = hs.dialog.textPrompt(prompt, details or "", "", "Ok", "Cancel", false)
+	return (btn == "Ok" and #val > 0) and val or nil
+end
+
+_G.pomodoro = {}
+
+function _G.pomodoro:start(duration)
+	self.chooser = hs.chooser.new(function() end)
+
+	self.duration = string.upper(duration)
+
+	local hours = tonumber(string.match(self.duration, "(%d+)H")) or 0
+	local minutes = tonumber(string.match(self.duration, "(%d+)M")) or 0
+	local seconds = tonumber(string.match(self.duration, "(%d+)S")) or 0
+
+	if (not hours and not minutes and not seconds) or (hours + minutes + seconds == 0) then
+		hs.alert.show("Invalid duration")
+		return
+	end
+
+	self.remaining = hours * 3600 + minutes * 60 + seconds
+	self.timer:start()
+	self.menu:setClickCallback(_(self.reset, self))
+end
+
+function _G.pomodoro:create_custom()
+	local duration = prompt_input("Duration")
+
+	if not duration then
+		hs.alert.show("No duration was given")
+		return
+	end
+
+	self.notes = prompt_input("Notes")
+	self:start(duration)
+end
+
+function _G.pomodoro:reset()
+	self.menu:setMenu({}):setClickCallback(_(self.create_custom, self)):setTitle("⏲️"):returnToMenuBar()
+
+	if self.notification:delivered() then
+		self.notification:withdraw()
+	end
+	self.duration = nil
+	self.notes = nil
+	self.timer:stop()
+	self.canvas:hide()
+	self.running = false
+end
+
+function _G.pomodoro:tick(_)
+	self.remaining = self.remaining - 1
+
+	local duration = ("%02d:%02d"):format(math.floor(self.remaining / 60), math.ceil(self.remaining % 60))
+
+	if self.remaining > 0 then
+		self.menu:setTitle(duration)
+	elseif self.remaining == 0 then
+		local sframe = hs.screen.mainScreen():frame()
+		self.canvas:frame(sframe):show()
+		self.menu:setTitle("00:00")
+		self.notification
+			:title(self.duration and self.duration .. " timer ended" or "Timer ended")
+			:informativeText(self.notes or "")
+			:send()
+	elseif self.remaining < 0 then
+		self:reset()
+	end
+end
+
+_G.pomodoro.timer = hs.timer.new(1, _(_G.pomodoro.tick, _G.pomodoro))
+_G.pomodoro.menu = hs.menubar.new(true)
+_G.pomodoro.canvas = hs.canvas
+	.new({ x = "0%", y = "0%", w = "100%", h = "100%" })
+	:insertElement({ type = "rectangle", id = "backdrop", fillColor = { red = 0.5, alpha = 0.3 } })
+_G.pomodoro.notification = hs.notify.new(nil, {
+	title = "",
+	subTitle = "",
+	informativeText = "",
+	alwaysPresent = true,
+	withdrawAfter = 90,
+})
+_G.pomodoro:reset()
+
 -- }}}
 -- {{{ Vi Config
 
@@ -55,6 +158,8 @@ Vi:mergeConfig({
 -- }}}
 -- {{{ Vi Bindings
 
+local CommandPalette = require("command_palette")
+
 Vi:mergeBindings({
 	-- {{{ Modes
 
@@ -65,6 +170,7 @@ Vi:mergeBindings({
 
 	{ "n", H("r"), _(hs.reload), { name = "Reload config" } },
 	{ "n", H("/"), _(hs.toggleConsole), { name = "Open console" } },
+	{ "n", "n", _(hs.notify.withdrawAll), { name = "Clear hs notifications" } },
 
 	-- }}}
 	-- {{{ Spaces Jump
@@ -82,6 +188,7 @@ Vi:mergeBindings({
 	{ "i", H("Space"), _(CommandPalette.show, CommandPalette), { name = "Command palette" } },
 	{ "i", H("."), _(System.window_chooser, "space"), { name = "Choose window (active space)" } },
 	{ "i", H("`"), _(System.window_chooser, "app"), { name = "Choose window (current application)" } },
+	{ "i", H(","), _(expose.show, expose), { name = "Show expose" } },
 
 	-- }}}
 	-- {{{ Goto
@@ -151,6 +258,10 @@ Vi:mergeBindings({
 	-- }}}
 	-- {{{ PaperWM
 
+	-- Starting and stopping
+	{ "i", "<D-C-A-w><S-Esc>", _(PaperWM.stop, PaperWM), { name = "Stop PaperWM" } },
+	{ "i", "<D-C-A-w><Esc>", _(PaperWM.start, PaperWM), { name = "Start/reload PaperWM" } },
+
 	-- Moving windows
 	{ "i", "<D-C-A-!>", _(paper.move_window_1), { name = "Move to Space 1" } },
 	{ "i", "<D-C-A-@>", _(paper.move_window_2), { name = "Move to Space 2" } },
@@ -158,8 +269,8 @@ Vi:mergeBindings({
 	{ "i", "<D-C-A-$>", _(paper.move_window_4), { name = "Move to Space 4" } },
 
 	-- Focus prev/next
-	{ "i", "<D-C-A-[>", _(paper.focus_prev), { name = "Focus prev" } },
-	{ "i", "<D-C-A-]>", _(paper.focus_next), { name = "Focus next" } },
+	{ "i", "<D-C-A-[>", _(paper.focus_left), { name = "Focus prev" } },
+	{ "i", "<D-C-A-]>", _(paper.focus_right), { name = "Focus next" } },
 
 	-- Swap prev/next
 	{ "i", "<D-C-A-{>", _(paper.swap_left), { name = "Swap prev" } },
